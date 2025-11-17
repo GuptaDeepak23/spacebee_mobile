@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { rw, rh, rf, rp } from '../utils/responsive'
 
 const Bookroom = ({ roomName, onClose }) => {
   const [meetingTitle, setMeetingTitle] = useState('')
@@ -41,7 +42,7 @@ const Bookroom = ({ roomName, onClose }) => {
                 value={startDate}
                 onChangeText={setStartDate}
               />
-              <Ionicons name="calendar-outline" size={20} color="#666" style={styles.inputIcon} />
+              <Ionicons name="calendar-outline" size={rf(20)} color="#666" style={styles.inputIcon} />
             </View>
           </View>
 
@@ -92,24 +93,24 @@ const styles = StyleSheet.create({
     // flex: ,
   },
   formContainer: {
-    marginBottom: 1,
+    marginBottom: rh(1),
   },
   inputGroup: {
-    marginBottom: 10,
+    marginBottom: rh(10),
   },
   label: {
-    fontSize: 14,
+    fontSize: rf(14),
     fontWeight: '600',
     color: '#1A1A1A',
-    marginBottom: 8,
+    marginBottom: rh(8),
   },
   input: {
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 8,
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    fontSize: 14,
+    borderRadius: rw(8),
+    paddingHorizontal: rp(16),
+    paddingVertical: rh(12),
+    fontSize: rf(14),
     color: '#1A1A1A',
     backgroundColor: '#fff',
   },
@@ -118,16 +119,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E0E0E0',
-    borderRadius: 8,
+    borderRadius: rw(8),
     backgroundColor: '#fff',
   },
   inputFlex: {
     flex: 1,
     borderWidth: 0,
-    paddingRight: 8,
+    paddingRight: rp(8),
   },
   inputIcon: {
-    paddingRight: 16,
+    paddingRight: rp(16),
   },
   rowContainer: {
     flexDirection: 'row',
@@ -137,19 +138,19 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   leftMargin: {
-    marginLeft: 12,
+    marginLeft: rw(12),
   },
   bookButton: {
     backgroundColor: '#00C896',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: rw(12),
+    paddingVertical: rh(16),
     alignItems: 'center',
     justifyContent: 'center',
-    marginTop:0,
+    marginTop: 0,
   },
   bookButtonText: {
     color: '#fff',
-    fontSize: 16,
+    fontSize: rf(16),
     fontWeight: 'bold',
   },
 })

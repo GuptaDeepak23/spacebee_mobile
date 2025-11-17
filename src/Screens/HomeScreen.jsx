@@ -6,6 +6,7 @@ import { TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
 import Bookroom from '../components/Bookroom'
+import { rw, rh, rf, rp, getScreenWidth } from '../utils/responsive'
 
 
 export const HomeScreen = () => {
@@ -37,23 +38,23 @@ export const HomeScreen = () => {
         </View>
         </View>
         <TouchableOpacity style={styles.bellButton}>
-    <Ionicons name="notifications-outline" size={25} color="#00C896" />
+    <Ionicons name="notifications-outline" size={rf(25)} color="#00C896" />
     {/* optional small red dot for notification */}
     <View style={styles.notificationDot} />
   </TouchableOpacity>
       </View>
       <View style={styles.searchContainer}>
       <View style={styles.searchBox}>
-    <Ionicons name="search-outline" size={18} color="#888" style={{ marginRight: 6 }} />
+    <Ionicons name="search-outline" size={rf(18)} color="#888" style={{ marginRight: rw(6) }} />
     <TextInput
       placeholder="Search meeting room"
       placeholderTextColor="#888"
-      style={{ flex: 1 }}
+      style={{ flex: 1, fontSize: rf(14) }}
     />
   </View>
   </View>
   <TouchableOpacity style={styles.filterButton}>
-    <Ionicons name="filter-outline" size={20} color="#fff" />
+    <Ionicons name="filter-outline" size={rf(20)} color="#fff" />
   </TouchableOpacity>
 
       <View style={styles.summaryRow}>
@@ -87,7 +88,7 @@ export const HomeScreen = () => {
 
     
 
-       <View style={styles.upcomingMeetingsContainer}>
+       {/* <View style={styles.upcomingMeetingsContainer}>
         <Text style={styles.sectionTitle}>Upcoming Meetings</Text>
         <Text style={styles.viewAll}>View All</Text>
       </View>
@@ -121,7 +122,7 @@ export const HomeScreen = () => {
                   index < tabs.length - 1 && styles.tabSpacing,
                 ]}>
                   {tab === 'Capacity' && (
-                    <Ionicons name="people-outline" size={16} color={activeTab === tab ? '#fff' : '#666'} style={{ marginRight: 4 }} />
+                    <Ionicons name="people-outline" size={rf(16)} color={activeTab === tab ? '#fff' : '#666'} style={{ marginRight: rw(4) }} />
                   )}
                   <Text style={[
                     styles.tabText,
@@ -164,58 +165,58 @@ export const HomeScreen = () => {
 
 
 const styles = StyleSheet.create({
-    container: { padding: 16, backgroundColor: '#fff',paddingTop:40},
-    header: { flexDirection: 'row', alignItems: 'center', marginVertical: 20,justifyContent: 'space-between' },
+    container: { padding: rp(16), backgroundColor: '#fff', paddingTop: rh(40) },
+    header: { flexDirection: 'row', alignItems: 'center', marginVertical: rh(20), justifyContent: 'space-between' },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
-    avatar: { width: 50, height: 50, borderRadius: 25, marginRight: 10 },
-    name: { fontWeight: 'bold', fontSize: 16 },
-    role: { color: '#666' },
-    summaryTitle:{fontWeight:'600'},
-    icon:{position:'absolute',bottom:-15,right:-10},
-    icon2:{position:'absolute',bottom:-15,right:-10},
-    summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: -10 },
-    summaryCard: { backgroundColor: '#E8FDF2', padding: 16, borderRadius: 12, width: '48%', },
-    number: { fontWeight: 'bold', fontSize: 18, marginTop: 6 },
-    sectionTitle: { fontWeight: 'bold', fontSize: 16 },
-    upcomingMeetingsContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12,marginTop:20 },
-    viewAll: { color: '#00C896', fontWeight: '600', fontSize: 12 },
+    avatar: { width: rw(50), height: rh(50), borderRadius: rw(25), marginRight: rw(10) },
+    name: { fontWeight: 'bold', fontSize: rf(16) },
+    role: { color: '#666', fontSize: rf(14) },
+    summaryTitle: { fontWeight: '600', fontSize: rf(14) },
+    icon: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(60), height: rh(30) },
+    icon2: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(45), height: rh(30) },
+    summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: rh(-10) },
+    summaryCard: { backgroundColor: '#E8FDF2', padding: rp(16), borderRadius: rw(12), width: '48%' },
+    number: { fontWeight: 'bold', fontSize: rf(18), marginTop: rh(6) },
+    sectionTitle: { fontWeight: 'bold', fontSize: rf(16) },
+    upcomingMeetingsContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(12), marginTop: rh(20) },
+    viewAll: { color: '#00C896', fontWeight: '600', fontSize: rf(12) },
     horizontalScroll: {
-      marginLeft: -16,
-      marginRight: -16,
+      marginLeft: rw(-16),
+      marginRight: rw(-16),
     },
     searchBox: {
         flexDirection: 'row',
         alignItems: 'center',
         backgroundColor: '#f2f2f2',
-        borderRadius: 10,
-        paddingHorizontal: 10,
+        borderRadius: rw(10),
+        paddingHorizontal: rp(10),
         flex: 1,
-        marginBottom: 10,
-        height: 40,
+        marginBottom: rh(10),
+        height: rh(40),
       },
     horizontalScrollContent: {
-      paddingLeft: 16,
-      paddingRight: 16,
-      paddingBottom: 8,
+      paddingLeft: rp(16),
+      paddingRight: rp(16),
+      paddingBottom: rh(8),
     },
-    roomContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 ,marginTop:10},
+    roomContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(12), marginTop: rh(10) },
     tabsScrollContainer: {
-      marginBottom: 16,
-      marginTop: 8,
+      marginBottom: rh(16),
+      marginTop: rh(8),
     },
     tabsContainer: {
       flexDirection: 'row',
-      paddingRight: 16,
+      paddingRight: rp(16),
     },
     tabSpacing: {
-      marginRight: 8,
+      marginRight: rw(8),
     },
     tab: {
       flexDirection: 'row',
       alignItems: 'center',
-      paddingHorizontal: 16,
-      paddingVertical: 8,
-      borderRadius: 20,
+      paddingHorizontal: rp(16),
+      paddingVertical: rh(8),
+      borderRadius: rw(20),
       backgroundColor: '#fff',
       borderWidth: 1,
       borderColor: '#E0E0E0',
@@ -225,7 +226,7 @@ const styles = StyleSheet.create({
       borderColor: '#00C896',
     },
     tabText: {
-      fontSize: 14,
+      fontSize: rf(14),
       color: '#666',
       fontWeight: '500',
     },
@@ -240,56 +241,55 @@ const styles = StyleSheet.create({
     },
     modalContent: {
       backgroundColor: '#fff',
-      borderTopLeftRadius: 20,
-      borderTopRightRadius: 20,
+      borderTopLeftRadius: rw(20),
+      borderTopRightRadius: rw(20),
       maxHeight: '90%',
       minHeight: '50%',
-      paddingTop: 20,
-      paddingHorizontal: 20,
+      paddingTop: rh(20),
+      paddingHorizontal: rp(20),
       flexDirection: 'column',
     },
     modalHeader: {
       flexDirection: 'row',
       justifyContent: 'space-between',
       alignItems: 'center',
-      marginBottom: 20,
+      marginBottom: rh(20),
     },
     modalBody: {
-      paddingBottom: 20,
+      paddingBottom: rh(20),
     },
     modalTitle: {
-      fontSize: 20,
+      fontSize: rf(20),
       fontWeight: 'bold',
       color: '#1A1A1A',
     },
     closeButton: {
-      padding: 4,
-      width:40,
-      height:40,
-      borderRadius:30,
-      backgroundColor:'rgba(30, 30, 30, 0.50)',
-      
+      padding: rp(4),
+      width: rw(40),
+      height: rh(40),
+      borderRadius: rw(30),
+      backgroundColor: 'rgba(30, 30, 30, 0.50)',
     },
     closeIcon: {
-      width: 25,
-      height: 20,
-      borderRadius:25,
+      width: rw(25),
+      height: rh(20),
+      borderRadius: rw(25),
       resizeMode: 'contain',
-      backgroundColor:'transparent',
-      position:'absolute',
-      color:'#FFFFFF',
-      right:6,
-      bottom:10,
+      backgroundColor: 'transparent',
+      position: 'absolute',
+      color: '#FFFFFF',
+      right: rw(7),
+      bottom: rh(10),
     },
     closeIconContainer: {
-      position:"absolute",
-      right:155,
-      bottom:80,
-      backgroundColor:'rgba(30, 30, 30, 0.50)',
-      borderRadius:30,
-      width:40,
-      height:40,
-      alignItems:'center',
-      justifyContent:'center',
+      position: 'absolute',
+      right: rw(140),
+      top: rh(-90),
+      backgroundColor: 'rgba(30, 30, 30, 0.50)',
+      borderRadius: rw(30),
+      width: rw(40),
+      height: rh(40),
+      alignItems: 'center',
+      justifyContent: 'center',
     }
   });

@@ -1,6 +1,7 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { rw, rh, rf, rp } from '../utils/responsive';
 export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
   const isAvailable = status === 'Available';
   return (
@@ -16,11 +17,11 @@ export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
           <View style={styles.detailRow}>
-            <Ionicons name="location-outline" size={14} color="#666" />
+            <Ionicons name="location-outline" size={rf(14)} color="#666" />
             <Text style={styles.detail}>{location}</Text>
           </View>
           <View style={styles.detailRow}>
-            <Ionicons name="people-outline" size={14} color="#666" />
+            <Ionicons name="people-outline" size={rf(14)} color="#666" />
             <Text style={styles.detail}>Capacity: {capacity}</Text>
           </View>
         </View>
@@ -32,7 +33,7 @@ export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
         disabled={!isAvailable}
         onPress={onBookRoom}
       >
-        <Text style={{ color: isAvailable ? '#fff' : '#666', fontWeight: '600', fontSize: 14 }}>
+        <Text style={{ color: isAvailable ? '#fff' : '#666', fontWeight: '600', fontSize: rf(14) }}>
           {isAvailable ? 'Book a Room' : 'Not Available'}
         </Text>
       </TouchableOpacity>
@@ -42,10 +43,10 @@ export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
 
 const styles = StyleSheet.create({
   card: {
-    marginBottom: 16,
+    marginBottom: rh(16),
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 12,
+    borderRadius: rw(16),
+    padding: rp(12),
     borderWidth: 1,
     borderColor: '#E9ECEF',
     elevation: 0,
@@ -54,58 +55,55 @@ const styles = StyleSheet.create({
   },
   statusContainer: {
     position: 'absolute',
-    top: 16,
-    right: -1,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderTopLeftRadius: 10,
-    borderBottomLeftRadius: 10,
-    // zIndex: 1,
+    top: rh(16),
+    right: rw(-1),
+    paddingHorizontal: rp(10),
+    paddingVertical: rh(4),
+    borderTopLeftRadius: rw(10),
+    borderBottomLeftRadius: rw(10),
   },
   status: {
     fontWeight: '600',
-    fontSize: 11,
+    fontSize: rf(11),
   },
   roomInfo: {
     flexDirection: 'row',
-    marginTop: 8,
-    marginBottom: 12,
+    marginTop: rh(8),
+    marginBottom: rh(12),
   },
   image: {
-    width: 80,
-    height: 80,
-    borderRadius: 8,
-    marginRight: 12,
+    width: rw(80),
+    height: rh(80),
+    borderRadius: rw(8),
+    marginRight: rw(12),
   },
   info: {
     flex: 1,
     justifyContent: 'flex-start',
-    
   },
   name: {
     fontWeight: '700',
-    fontSize: 16,
+    fontSize: rf(16),
     color: '#1A1A1A',
-    // marginBottom: 8,
-    marginTop: -5,
-    marginBottom: 5,
+    marginTop: rh(-5),
+    marginBottom: rh(5),
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: rh(4),
   },
   detail: {
     color: '#666',
-    fontSize: 13,
-    marginLeft: 6,
+    fontSize: rf(13),
+    marginLeft: rw(6),
   },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 10,
-    borderRadius: 15,
+    padding: rp(10),
+    borderRadius: rw(15),
     width: '100%',
-    height:45
+    height: rh(45)
   },
 });

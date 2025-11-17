@@ -1,12 +1,13 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { rw, rh, rf, rp } from '../utils/responsive'
 
 const MyBookingScreen = () => {
   const tabs = ['All', 'Upcoming', 'Past', 'Cancelled']
   const [activeTab, setActiveTab] = useState('All')
 
-  const bookings = [
+  const allBookings = [
     {
       id: 1,
       title: 'Product Roadmap Q1 Review',
@@ -20,17 +21,17 @@ const MyBookingScreen = () => {
     // Add more bookings as needed
   ]
 
+  // Filter bookings based on active tab
+  const filteredBookings = activeTab === 'All' 
+    ? allBookings 
+    : allBookings.filter(booking => booking.status === activeTab)
+
   return (
     <View style={styles.container}>
       <Text style={styles.title}>My Bookings</Text>
       
       {/* Tabs */}
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.tabsScrollContainer}
-        contentContainerStyle={styles.tabsContainer}
-      >
+      <View style={styles.tabsContainer}>
         {tabs.map((tab, index) => {
           return (
             <TouchableOpacity 
@@ -49,7 +50,7 @@ const MyBookingScreen = () => {
             </TouchableOpacity>
           )
         })}
-      </ScrollView>
+      </View>
 
       {/* Booking Cards */}
       <ScrollView 
@@ -57,7 +58,8 @@ const MyBookingScreen = () => {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        {bookings.map((booking) => (
+        {filteredBookings.length > 0 ? (
+          filteredBookings.map((booking) => (
           <View key={booking.id} style={styles.bookingCard}>
             {/* Title and Status */}
             <View style={styles.cardHeader}>
@@ -70,26 +72,27 @@ const MyBookingScreen = () => {
             {/* Meeting Details */}
             <View style={styles.detailsContainer}>
               <View style={styles.detailRow}>
-                <Ionicons name="calendar-outline" size={16} color="#666" />
+                <Ionicons name="calendar-outline" size={rf(16)} color="#666" />
                 <Text style={styles.detailText}>{booking.date}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Ionicons name="time-outline" size={16} color="#666" />
+                <Ionicons name="time-outline" size={rf(16)} color="#666" />
                 <Text style={styles.detailText}>{booking.time}</Text>
               </View>
               <View style={styles.detailRow}>
-                <Ionicons name="business-outline" size={16} color="#666" />
+                <Ionicons name="location-outline" size={rf(16)} color="#666" />
                 <Text style={styles.detailText}>{booking.location}</Text>
               </View>
-            </View>
-
-            {/* Host Information */}
-            <View style={styles.hostContainer}>
+              <View style={styles.hostContainer}>
               <View style={styles.hostAvatar}>
                 <Text style={styles.hostInitials}>{booking.hostInitials}</Text>
               </View>
               <Text style={styles.hostText}>Hosted by {booking.host}</Text>
             </View>
+            </View>
+
+            {/* Host Information */}
+           
 
             {/* Action Buttons */}
             <View style={styles.actionButtons}>
@@ -101,7 +104,12 @@ const MyBookingScreen = () => {
               </TouchableOpacity>
             </View>
           </View>
-        ))}
+          ))
+        ) : (
+          <View style={styles.emptyContainer}>
+            <Text style={styles.emptyText}>No {activeTab.toLowerCase()} bookings found</Text>
+          </View>
+        )}
       </ScrollView>
     </View>
   )
@@ -109,43 +117,42 @@ const MyBookingScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    // flex: 1,
-   
-    padding: 16,
-    paddingTop: 45,
+    flex: 1,
+    padding: rp(16),
+    paddingTop: rh(45),
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: 24,
+    fontSize: rf(24),
     fontWeight: 'bold',
     color: '#1A1A1A',
-    marginBottom: 20,
-  },
-  tabsScrollContainer: {
-    marginBottom: 20,
+    marginBottom: rh(20),
   },
   tabsContainer: {
-    // flexDirection: 'row',
-    paddingRight: 16,
+    flexDirection: 'row',
+    marginBottom: rh(20),
   },
   tabSpacing: {
-    marginRight: 8,
+    marginRight: rw(8),
   },
   tab: {
     
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: rp(14),
+    paddingVertical: rh(10),
+    borderRadius: rw(20),
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E0E0E0',
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: rh(30),
   },
   activeTab: {
-    backgroundColor: '#00C896',
+    backgroundColor: '#22BF96',
     borderColor: '#00C896',
   },
   tabText: {
-    fontSize: 14,
+    fontSize: rf(14),
     color: '#666',
     fontWeight: '500',
   },
@@ -157,13 +164,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: 20,
+    paddingBottom: rh(20),
   },
   bookingCard: {
     backgroundColor: '#fff',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    borderRadius: rw(16),
+    padding: rp(16),
+    marginBottom: rh(16),
     borderWidth: 1,
     borderColor: '#E9ECEF',
     shadowColor: '#000',
@@ -179,96 +186,117 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: 16,
+    marginBottom: rh(16),
   },
   meetingTitle: {
-    fontSize: 18,
+    fontSize: rf(18),
     fontWeight: 'bold',
     color: '#1A1A1A',
     flex: 1,
-    marginRight: 12,
+    marginRight: rw(12),
+    lineHeight: rf(24),
   },
   statusBadge: {
     backgroundColor: '#00C896',
-    paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: rp(14),
+    paddingVertical: rh(6),
+    left: rw(17),
+    
+    alignSelf: 'flex-start',
+    borderTopLeftRadius: rw(20),
+    borderBottomLeftRadius: rw(20),
   },
   statusText: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: rf(12),
     fontWeight: '600',
   },
   detailsContainer: {
-    marginBottom: 16,
+    marginBottom: rh(16),
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 8,
+    marginBottom: rh(10),
   },
   detailText: {
-    fontSize: 14,
+    fontSize: rf(14),
     color: '#666',
-    marginLeft: 8,
+    marginLeft: rw(8),
   },
   hostContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 16,
-    paddingTop: 12,
-    borderTopWidth: 1,
-    borderTopColor: '#F0F0F0',
+   
+    borderBottomColor: '#E9ECEF',
+    borderBottomWidth: 1,
+    paddingBottom: rh(12),
+   
   },
   hostAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: rw(32),
+    height: rh(32),
+    borderRadius: rw(16),
     backgroundColor: '#00C896',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 8,
+    marginRight: rw(8),
   },
   hostInitials: {
     color: '#fff',
-    fontSize: 12,
+    fontSize: rf(12),
     fontWeight: 'bold',
   },
   hostText: {
-    fontSize: 14,
+    fontSize: rf(14),
     color: '#666',
   },
   actionButtons: {
     flexDirection: 'row',
+   
+   
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: rh(12),
+    borderRadius: rw(15),
     borderWidth: 1,
     borderColor: '#E0E0E0',
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 12,
+    marginRight: rw(12),
   },
   cancelButtonText: {
     color: '#666',
-    fontSize: 14,
+    fontSize: rf(14),
     fontWeight: '600',
   },
   rescheduleButton: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#00C896',
+    paddingVertical: rh(12),
+    borderRadius: rw(15),
+    borderWidth: 1.5,
+    borderColor: '#22BF96',
+    backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
   },
   rescheduleButtonText: {
-    color: '#fff',
-    fontSize: 14,
+    color: '#00C896',
+    fontSize: rf(14),
     fontWeight: '600',
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: rh(40),
+    minHeight: rh(200),
+  },
+  emptyText: {
+    fontSize: rf(16),
+    color: '#999',
+    textAlign: 'center',
   },
 })
 
