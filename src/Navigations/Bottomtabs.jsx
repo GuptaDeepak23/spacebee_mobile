@@ -63,16 +63,17 @@ export const Bottomtabs = () => {
         component={HomeScreen}
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="home" size={size || 24} color={color} /> }}
       />
+        <Tab.Screen 
+        name="MyBooking" 
+        component={MyBookingScreen}
+        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="book" size={size || 24} color={color} /> }}
+      />
       <Tab.Screen 
         name="Calendar" 
         component={CalendarScreen}
         options={{ tabBarIcon: ({ color, size }) => <Ionicons name="calendar" size={size || 24} color={color} /> }}
       />
-      <Tab.Screen 
-        name="MyBooking" 
-        component={MyBookingScreen}
-        options={{ tabBarIcon: ({ color, size }) => <Ionicons name="book" size={size || 24} color={color} /> }}
-      />
+    
       <Tab.Screen 
         name="Profile" 
         component={ProfileScreen}

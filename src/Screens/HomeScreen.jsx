@@ -38,7 +38,10 @@ export const HomeScreen = () => {
         </View>
         </View>
         <TouchableOpacity style={styles.bellButton}>
-    <Ionicons name="notifications-outline" size={rf(25)} color="#00C896" />
+          <View style={styles.bellButtonContainer}>
+          <Ionicons name="notifications-outline" size={rf(25)} color="black" />
+          </View>
+   
     {/* optional small red dot for notification */}
     <View style={styles.notificationDot} />
   </TouchableOpacity>
@@ -106,7 +109,7 @@ export const HomeScreen = () => {
       {/* All Rooms */}
       <View style={styles.roomContainer}>
       <Text style={styles.sectionTitle}>All Rooms</Text>
-      <Text style={styles.viewAll}>View All</Text>
+      
       </View>
       <ScrollView 
         horizontal 
@@ -169,15 +172,15 @@ const styles = StyleSheet.create({
     header: { flexDirection: 'row', alignItems: 'center', marginVertical: rh(20), justifyContent: 'space-between' },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
     avatar: { width: rw(50), height: rh(50), borderRadius: rw(25), marginRight: rw(10) },
-    name: { fontWeight: 'bold', fontSize: rf(16) },
+    name: { fontWeight: '500', fontSize: rf(16) },
     role: { color: '#666', fontSize: rf(14) },
-    summaryTitle: { fontWeight: '600', fontSize: rf(14) },
+    summaryTitle: { fontWeight: '400', fontSize: rf(14) },
     icon: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(60), height: rh(30) },
     icon2: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(45), height: rh(30) },
     summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: rh(-10) },
     summaryCard: { backgroundColor: '#E8FDF2', padding: rp(16), borderRadius: rw(12), width: '48%' },
     number: { fontWeight: 'bold', fontSize: rf(18), marginTop: rh(6) },
-    sectionTitle: { fontWeight: 'bold', fontSize: rf(16) },
+    sectionTitle: { fontWeight: '900', fontSize: rf(16) ,fontFamily:'Arial, Helvetica, sans-serif'},
     upcomingMeetingsContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(12), marginTop: rh(20) },
     viewAll: { color: '#00C896', fontWeight: '600', fontSize: rf(12) },
     horizontalScroll: {
@@ -187,8 +190,10 @@ const styles = StyleSheet.create({
     searchBox: {
         flexDirection: 'row',
         alignItems: 'center',
-        backgroundColor: '#f2f2f2',
-        borderRadius: rw(10),
+        // backgroundColor: '#f2f2f2',
+        borderWidth: 1,
+        borderColor: '#E0E0E0',
+        borderRadius: rw(11),
         paddingHorizontal: rp(10),
         flex: 1,
         marginBottom: rh(10),
@@ -199,7 +204,7 @@ const styles = StyleSheet.create({
       paddingRight: rp(16),
       paddingBottom: rh(8),
     },
-    roomContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(12), marginTop: rh(10) },
+    roomContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(8), marginTop: rh(10) ,paddingTop: rh(8)},
     tabsScrollContainer: {
       marginBottom: rh(16),
       marginTop: rh(8),
@@ -226,9 +231,9 @@ const styles = StyleSheet.create({
       borderColor: '#00C896',
     },
     tabText: {
-      fontSize: rf(14),
-      color: '#666',
-      fontWeight: '500',
+      fontSize: rf(13),
+      color: '#6B7280',
+     
     },
     activeTabText: {
       color: '#fff',
@@ -291,5 +296,13 @@ const styles = StyleSheet.create({
       height: rh(40),
       alignItems: 'center',
       justifyContent: 'center',
-    }
+    },
+    bellButtonContainer: {
+      backgroundColor: '#E4FFF4',
+      borderRadius: rw(30),
+      width: rw(40),
+      height: rh(40),
+      alignItems: 'center',
+      justifyContent: 'center',
+    },
   });

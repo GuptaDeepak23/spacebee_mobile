@@ -134,12 +134,13 @@ const ProfileScreen = () => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
+    
+    
     backgroundColor: '#F5F5F5',
   },
   profileHeader: {
     backgroundColor: '#22BF96',
-    height: rh(270),
+    height: rh(280),
     paddingTop: rh(45),
     paddingBottom: rh(24),
     paddingHorizontal: rp(16),
@@ -196,7 +197,7 @@ const styles = StyleSheet.create({
     color: '#fff',
   },
   contactInfo: {
-    marginTop: rh(4),
+    // marginTop: rh(2),
   },
   contactRow: {
     flexDirection: 'row',
@@ -210,7 +211,7 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     backgroundColor: '#fff',
-    marginTop: rh(-55),
+    marginTop: rh(-60),
    borderRadius: rw(20),
     padding: rp(20),
     marginHorizontal: rp(16),
@@ -226,8 +227,8 @@ const styles = StyleSheet.create({
   },
   sectionTitle: {
     fontSize: rf(14),
-    fontWeight: '400',
-    color: '#757575',
+    fontWeight: '600',
+    color: '#1E1E1E',
  
     marginBottom: rh(16),
   },
@@ -289,14 +290,15 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listItemText: {
-    fontSize: rf(16),
+    fontSize: rf(14),
     color: '#1A1A1A',
     marginLeft: rw(12),
   },
   listDivider: {
     height: 1,
+    width: '100%',
     backgroundColor: '#E9ECEF',
-    marginLeft: rw(32),
+    
   },
   bottomPadding: {
     height: rh(20),

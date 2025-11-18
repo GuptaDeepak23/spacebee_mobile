@@ -230,7 +230,7 @@ const styles = StyleSheet.create({
     paddingBottom: rh(20),
   },
   headerTitle: {
-    fontSize: rf(24),
+    fontSize: rf(16),
     fontWeight: 'bold',
     color: '#1A1A1A',
   },
@@ -255,8 +255,8 @@ const styles = StyleSheet.create({
     marginHorizontal: rw(16),
   },
   monthText: {
-    fontSize: rf(20),
-    fontWeight: 'bold',
+    fontSize: rf(16),
+    fontWeight: '500',
     color: '#1A1A1A',
   },
   yearText: {
@@ -354,7 +354,7 @@ const styles = StyleSheet.create({
     padding: rp(16),
   },
   eventTitle: {
-    fontSize: rf(16),
+    fontSize: rf(14),
     fontWeight: 'bold',
     color: '#1A1A1A',
     marginBottom: rh(4),
@@ -367,6 +367,9 @@ const styles = StyleSheet.create({
     paddingHorizontal: rp(20),
     paddingVertical: rh(8),
     marginRight: rw(16),
+    borderWidth: 1,
+    borderColor: '#E9ECEF',
+    borderRadius: rw(12),
   },
   viewButtonText: {
     fontSize: rf(14),

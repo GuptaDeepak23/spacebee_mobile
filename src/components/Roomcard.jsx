@@ -68,12 +68,12 @@ const styles = StyleSheet.create({
   },
   roomInfo: {
     flexDirection: 'row',
-    marginTop: rh(8),
+    marginTop: rh(1),
     marginBottom: rh(12),
   },
   image: {
-    width: rw(80),
-    height: rh(80),
+    width: rw(60),
+    height: rh(60),
     borderRadius: rw(8),
     marginRight: rw(12),
   },
@@ -83,9 +83,9 @@ const styles = StyleSheet.create({
   },
   name: {
     fontWeight: '700',
-    fontSize: rf(16),
+    fontSize: rf(14),
     color: '#1A1A1A',
-    marginTop: rh(-5),
+    marginTop: rh(-1),
     marginBottom: rh(5),
   },
   detailRow: {
@@ -102,8 +102,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: rp(10),
-    borderRadius: rw(15),
+    borderRadius: rw(8),
     width: '100%',
-    height: rh(45)
+    height: rh(40)
   },
 });

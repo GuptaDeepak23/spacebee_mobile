@@ -123,7 +123,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: rf(24),
+    fontSize: rf(16),
     fontWeight: 'bold',
     color: '#1A1A1A',
     marginBottom: rh(20),
@@ -153,8 +153,8 @@ const styles = StyleSheet.create({
   },
   tabText: {
     fontSize: rf(14),
-    color: '#666',
-    fontWeight: '500',
+    color: '#6B7280',
+    fontWeight: '400',
   },
   activeTabText: {
     color: '#fff',
@@ -173,24 +173,17 @@ const styles = StyleSheet.create({
     marginBottom: rh(16),
     borderWidth: 1,
     borderColor: '#E9ECEF',
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: rh(16),
+    marginBottom: rh(5),
   },
   meetingTitle: {
-    fontSize: rf(18),
-    fontWeight: 'bold',
+    fontWeight: '700',
+    fontSize: rf(14),
     color: '#1A1A1A',
     flex: 1,
     marginRight: rw(12),
@@ -258,7 +251,7 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     flex: 1,
-    paddingVertical: rh(12),
+    paddingVertical: rh(10),
     borderRadius: rw(15),
     borderWidth: 1,
     borderColor: '#E0E0E0',
@@ -274,9 +267,9 @@ const styles = StyleSheet.create({
   },
   rescheduleButton: {
     flex: 1,
-    paddingVertical: rh(12),
+    paddingVertical: rh(10),
     borderRadius: rw(15),
-    borderWidth: 1.5,
+    borderWidth: 1,
     borderColor: '#22BF96',
     backgroundColor: '#fff',
     alignItems: 'center',
