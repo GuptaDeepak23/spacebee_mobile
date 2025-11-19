@@ -53,7 +53,6 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E9ECEF',
     elevation: 0,
-    shadowColor: 'transparent',
   },
   hostAvatar: {
     width: rw(24),
