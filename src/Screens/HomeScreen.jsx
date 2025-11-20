@@ -7,6 +7,8 @@ import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
 import Bookroom from '../components/Bookroom'
 import { rw, rh, rf, rp, getScreenWidth } from '../utils/responsive'
+import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 
 export const HomeScreen = () => {
@@ -46,19 +48,56 @@ export const HomeScreen = () => {
     <View style={styles.notificationDot} />
   </TouchableOpacity>
       </View>
-      <View style={styles.searchContainer}>
+      <View style={{paddingVertical: responsiveHeight(0)}} >
       <View style={styles.searchBox}>
-    <Ionicons name="search-outline" size={rf(18)} color="#888" style={{ marginRight: rw(6) }} />
+        <View style={styles.searchIconContainer}>
+    <Ionicons name="search-outline" size={responsiveFontSize(2)} color="#888" style={{ marginRight: responsiveWidth(1) }} />
     <TextInput
       placeholder="Search meeting room"
       placeholderTextColor="#888"
-      style={{ flex: 1, fontSize: rf(14) }}
+      style={{  fontSize: responsiveFontSize(1.5), paddingVertical: responsiveHeight(0) }}
     />
+    </View>
+    <View style={styles.filterIconContainer}>
+          <View style={styles.line}></View>
+          <Image source={require('../../assets/filter-horizontal.png')} style={styles.filterIcon} />
+    </View>
   </View>
   </View>
   <TouchableOpacity style={styles.filterButton}>
-    <Ionicons name="filter-outline" size={rf(20)} color="#fff" />
+    <Ionicons name="filter-outline" size={responsiveFontSize(3)} color="#fff" />
   </TouchableOpacity>
+
+  {/* <View style={styles.alertContainer}>
+    <View style={styles.alertIconContainer}>
+      <View style={styles.alertIconContent}>
+      <View style={styles.alertIconImageContainer}>
+        <Image source={require('../../assets/Container.jpg')} style={styles.alertIcon} />
+      </View>
+      <View>
+        <Text style={styles.nextbutton}>Next Meeting</Text>
+        <Text style={styles.alertDetailsSubtitle}>in 10 minutes</Text>
+      </View>
+      </View>
+      <View>
+        <Text style={styles.alertDetailsTime}>10:00 AM</Text>
+      </View>
+    </View>
+    <View style={styles.alertDetailsContainer}>
+      <View style={styles.alertDetailsText}>
+        <Text style={styles.alertDetailsTitle}>Product Roadmap Q1 Review</Text>
+        <View style={styles.alertDetailsLocationContainer}>
+          <Ionicons name="location-outline" size={responsiveFontSize(1.7)} color="#666" />
+        <Text style={styles.alertDetailsSubtitle}>Conference Room A • 3rd Floor</Text>
+        </View>
+      </View>
+      <View>
+        <TouchableOpacity style={styles.modifyButton}>
+          <Text style={{color:'#FFFFFF'}}>Modify</Text>
+        </TouchableOpacity>
+      </View>
+    </View>
+  </View> */}
 
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
@@ -168,17 +207,18 @@ export const HomeScreen = () => {
 
 
 const styles = StyleSheet.create({
-    container: { padding: rp(16), backgroundColor: '#fff', paddingTop: rh(40) },
-    header: { flexDirection: 'row', alignItems: 'center', marginVertical: rh(20), justifyContent: 'space-between' },
+    container: { padding: responsiveWidth(3), backgroundColor: '#fff', paddingTop: responsiveHeight(2) },
+    header: { flexDirection: 'row', alignItems: 'center', marginVertical: responsiveHeight(2), justifyContent: 'space-between' },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
-    avatar: { width: rw(50), height: rh(50), borderRadius: rw(25), marginRight: rw(10) },
-    name: { fontWeight: '500', fontSize: rf(16) },
-    role: { color: '#666', fontSize: rf(14) },
-    summaryTitle: { fontWeight: '400', fontSize: rf(14) },
-    icon: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(60), height: rh(30) },
-    icon2: { position: 'absolute', bottom: rh(-15), right: rw(-10), width: rw(45), height: rh(30) },
-    summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: rh(-10) },
-    summaryCard: { backgroundColor: '#E8FDF2', padding: rp(16), borderRadius: rw(12), width: '48%' },
+    avatar: { width: responsiveWidth(12), height: responsiveHeight(6), borderRadius: responsiveWidth(6), marginRight: responsiveWidth(2.5) },
+    bellButton: { backgroundColor: '#E8FDF2', borderRadius: rw(30), width: rw(40), height: rh(40), alignItems: 'center', justifyContent: 'center' },
+    name: { fontWeight: '500', fontSize: responsiveFontSize(2) },
+    role: { color: '#666', fontSize: responsiveFontSize(1.8) },
+    summaryTitle: { fontWeight: '400', fontSize: responsiveFontSize(1.8) },
+    icon: { position: 'absolute', bottom: responsiveHeight(-1.8), right: responsiveWidth(-1), width: responsiveWidth(10), height: responsiveHeight(4) },
+    icon2: { position: 'absolute', bottom: responsiveHeight(-1.8), right: responsiveWidth(-2), width: responsiveWidth(10), height: responsiveHeight(4) },
+    summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: responsiveHeight(-1) },
+    summaryCard: { backgroundColor: '#E8FDF2', padding: responsiveWidth(3.8), borderRadius: rw(12), width: responsiveWidth(45) },
     number: { fontWeight: 'bold', fontSize: rf(18), marginTop: rh(6) },
     sectionTitle: { fontWeight: '900', fontSize: rf(16) ,fontFamily:'Arial, Helvetica, sans-serif'},
     upcomingMeetingsContainer: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: rh(12), marginTop: rh(20) },
@@ -187,17 +227,40 @@ const styles = StyleSheet.create({
       marginLeft: rw(-16),
       marginRight: rw(-16),
     },
+    searchIconContainer: {
+      flexDirection: 'row',
+   
+      
+    },
+    filterIconContainer: {
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      gap: responsiveWidth(2),
+    },
+    line: {
+      width: responsiveWidth(0.3),
+      height: responsiveHeight(3),
+      backgroundColor: '#E0E0E0',
+    },
+    filterIcon: {
+      width: responsiveWidth(6),
+      height: responsiveHeight(3),
+      resizeMode: 'contain',
+    },
     searchBox: {
         flexDirection: 'row',
         alignItems: 'center',
         // backgroundColor: '#f2f2f2',
+        justifyContent: 'space-between',
         borderWidth: 1,
         borderColor: '#E0E0E0',
         borderRadius: rw(11),
-        paddingHorizontal: rp(10),
+        paddingHorizontal: responsiveWidth(2),
+        
         flex: 1,
-        marginBottom: rh(10),
-        height: rh(40),
+        marginBottom: responsiveHeight(),
+        height: responsiveHeight(5),
       },
     horizontalScrollContent: {
       paddingLeft: rp(16),
@@ -305,4 +368,83 @@ const styles = StyleSheet.create({
       alignItems: 'center',
       justifyContent: 'center',
     },
+    alertContainer:{
+      backgroundColor: '#E9F9F5',
+      padding: responsiveWidth(2),
+      width: responsiveWidth(100),
+      marginBottom: responsiveHeight(2),
+      marginTop: responsiveHeight(2),
+      padding: responsiveWidth(2),
+     
+    },
+   alertIconContainer:{
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    gap: responsiveWidth(2),
+  
+
+   },
+   alertIconContent:{
+    flexDirection: 'row',
+
+    gap: responsiveWidth(2),
+   },
+   alertIconImageContainer:{
+    backgroundColor: '#22BF96',
+
+   },
+    alertIcon: {
+      width: responsiveWidth(11),
+      height: responsiveHeight(5),
+      resizeMode: 'contain',
+      
+      
+    },
+    alertDetailsLocationContainer:{
+      flexDirection: 'row',
+      alignItems: 'center',
+      gap: responsiveWidth(1),
+    },
+    alertDetailsContainer:{
+      flexDirection: 'row',
+      justifyContent: 'space-between',
+      gap: responsiveWidth(2),
+    },
+    modifyButton:{
+      backgroundColor:'#22BF96',
+      padding: responsiveWidth(3),
+      borderRadius: responsiveWidth(3),
+      width: responsiveWidth(20),
+      // height: responsiveHeight(4),
+      alignItems: 'center',
+      justifyContent: 'center',
+      marginTop: responsiveHeight(1),
+    },
+    modifyButtonText:{
+      color:'#FFFFFF',
+      fontSize: responsiveFontSize(1.5),
+      fontWeight: 'bold',
+    },
+    alertDetailsText:{
+      marginTop: responsiveHeight(1),
+      gap: responsiveWidth(2),
+    },
+    alertDetailsTitle:{
+      fontWeight: '600',
+      fontSize: responsiveFontSize(1.7),
+      color: '#1E1E1E',
+    },
+    alertDetailsSubtitle:{
+      fontSize: responsiveFontSize(1.5),
+      color: '#6B7280',
+    },
+    nextbutton:{
+      fontWeight: '600',
+      fontSize: responsiveFontSize(1.7),
+      color: '#22BF96',
+    },
+    alertDetailsTime:{
+      fontWeight: '800',
+    }
+
   });

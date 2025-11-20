@@ -2,6 +2,7 @@ import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { rw, rh, rf, rp } from '../utils/responsive';
+import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
   const isAvailable = status === 'Available';
   return (
@@ -17,11 +18,11 @@ export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
         <View style={styles.info}>
           <Text style={styles.name}>{name}</Text>
           <View style={styles.detailRow}>
-            <Ionicons name="location-outline" size={rf(14)} color="#666" />
+            <Ionicons name="location-outline" size={responsiveFontSize(1.7)} color="#666" />
             <Text style={styles.detail}>{location}</Text>
           </View>
           <View style={styles.detailRow}>
-            <Ionicons name="people-outline" size={rf(14)} color="#666" />
+            <Ionicons name="people-outline" size={responsiveFontSize(1.7)} color="#666" />
             <Text style={styles.detail}>Capacity: {capacity}</Text>
           </View>
         </View>
@@ -33,7 +34,7 @@ export const RoomCard = ({ name, status, capacity, location, onBookRoom }) => {
         disabled={!isAvailable}
         onPress={onBookRoom}
       >
-        <Text style={{ color: isAvailable ? '#fff' : '#666', fontWeight: '600', fontSize: rf(14) }}>
+        <Text style={{ color: isAvailable ? '#fff' : '#666', fontWeight: '600', fontSize: responsiveFontSize(1.5) }}>
           {isAvailable ? 'Book a Room' : 'Not Available'}
         </Text>
       </TouchableOpacity>
@@ -71,38 +72,40 @@ const styles = StyleSheet.create({
     marginBottom: rh(12),
   },
   image: {
-    width: rw(60),
-    height: rh(60),
-    borderRadius: rw(8),
-    marginRight: rw(12),
+    width: responsiveWidth(15),
+    height: responsiveHeight(8),
+    borderRadius: responsiveWidth(2),
+    marginRight: responsiveWidth(3),
   },
   info: {
     flex: 1,
     justifyContent: 'flex-start',
+    gap: responsiveHeight(0.4),
   },
   name: {
     fontWeight: '700',
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.7),
     color: '#1A1A1A',
-    marginTop: rh(-1),
-    marginBottom: rh(5),
+    // marginTop: rh(-1),
+    // marginBottom: rh(5),
   },
   detailRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: rh(4),
+    // marginBottom: rh(4),
   },
   detail: {
     color: '#666',
-    fontSize: rf(13),
-    marginLeft: rw(6),
+    fontSize: responsiveFontSize(1.6),
+    marginLeft: responsiveWidth(1),
   },
   button: {
     alignItems: 'center',
     justifyContent: 'center',
-    padding: rp(10),
+    padding: responsiveWidth(1),
+   
     borderRadius: rw(8),
     width: '100%',
-    height: rh(40)
+    height: responsiveHeight(4)
   },
 });

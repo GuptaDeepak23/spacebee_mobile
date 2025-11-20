@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { rw, rh, rf, rp } from '../utils/responsive'
+import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 
 const MyBookingScreen = () => {
   const tabs = ['All', 'Upcoming', 'Past', 'Cancelled']
@@ -118,41 +119,41 @@ const MyBookingScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: rp(16),
-    paddingTop: rh(45),
+    padding: responsiveWidth(4),
+    paddingTop: responsiveHeight(5),
     backgroundColor: '#fff',
   },
   title: {
-    fontSize: rf(16),
+    fontSize: responsiveFontSize(2),
     fontWeight: 'bold',
     color: '#1A1A1A',
-    marginBottom: rh(20),
+    marginBottom: responsiveHeight(2),
   },
   tabsContainer: {
     flexDirection: 'row',
-    marginBottom: rh(20),
+    marginBottom: responsiveHeight(2),
   },
   tabSpacing: {
-    marginRight: rw(8),
+    marginRight: responsiveWidth(2),
   },
   tab: {
     
-    paddingHorizontal: rp(14),
-    paddingVertical: rh(10),
-    borderRadius: rw(20),
+    paddingHorizontal: responsiveWidth(3.5),
+    paddingVertical: responsiveHeight(1),
+    borderRadius: responsiveWidth(5),
     backgroundColor: '#fff',
     borderWidth: 1,
     borderColor: '#E0E0E0',
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: rh(30),
+    minHeight: responsiveHeight(3),
   },
   activeTab: {
     backgroundColor: '#22BF96',
     borderColor: '#00C896',
   },
   tabText: {
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.7),
     color: '#6B7280',
     fontWeight: '400',
   },
@@ -164,13 +165,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingBottom: rh(20),
+    paddingBottom: responsiveHeight(2),
   },
   bookingCard: {
     backgroundColor: '#fff',
-    borderRadius: rw(16),
-    padding: rp(16),
-    marginBottom: rh(16),
+    borderRadius: responsiveWidth(4),
+    padding: responsiveWidth(4),
+    marginBottom: responsiveHeight(2),
     borderWidth: 1,
     borderColor: '#E9ECEF',
     
@@ -179,21 +180,21 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'flex-start',
-    marginBottom: rh(5),
+    marginBottom: responsiveHeight(1),
   },
   meetingTitle: {
     fontWeight: '700',
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(2),
     color: '#1A1A1A',
     flex: 1,
-    marginRight: rw(12),
-    lineHeight: rf(24),
+    marginRight: responsiveWidth(3),
+    lineHeight: responsiveHeight(2.5),
   },
   statusBadge: {
     backgroundColor: '#00C896',
-    paddingHorizontal: rp(14),
-    paddingVertical: rh(6),
-    left: rw(17),
+    paddingHorizontal: responsiveWidth(3.5),
+    paddingVertical: responsiveHeight(0.7),
+    left: responsiveWidth(4.2),
     
     alignSelf: 'flex-start',
     borderTopLeftRadius: rw(20),

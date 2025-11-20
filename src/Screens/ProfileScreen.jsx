@@ -2,6 +2,7 @@ import React from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { rw, rh, rf, rp } from '../utils/responsive'
+import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 
 const ProfileScreen = () => {
   return (
@@ -126,6 +127,11 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
+        <View style={styles.logoutButton}>
+          <Text style={styles.logoutButtonText}>Log</Text>
+          <Text style={styles.logoutButtonText}>Out</Text>
+          
+        </View>
       {/* Bottom padding for scroll */}
       <View style={styles.bottomPadding} />
     </ScrollView>
@@ -140,23 +146,24 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     backgroundColor: '#22BF96',
-    height: rh(280),
-    paddingTop: rh(45),
-    paddingBottom: rh(24),
-    paddingHorizontal: rp(16),
+    height: responsiveHeight(33),
+    paddingTop: responsiveHeight(5),
+    paddingBottom: responsiveHeight(3),
+    paddingHorizontal: responsiveWidth(4.5),
   },
   profileTop: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: rh(20),
+    
+    marginBottom: responsiveHeight(2),
   },
   avatarContainer: {
-    marginRight: rw(12),
+    marginRight: responsiveWidth(3),
   },
   avatar: {
-    width: rw(60),
-    height: rh(60),
-    borderRadius: rw(30),
+    width: responsiveWidth(15.5),
+    height: responsiveHeight(6),
+    borderRadius: responsiveWidth(15.5),
     backgroundColor: '#fff',
     borderWidth: 3,
     borderColor: '#90EE90',
@@ -164,7 +171,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   avatarText: {
-    fontSize: rf(20),
+    fontSize: responsiveFontSize(2.5),
     fontWeight: 'bold',
     color: '#00C896',
   },
@@ -173,31 +180,31 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   name: {
-    fontSize: rf(20),
+    fontSize: responsiveFontSize(2.5),
     fontWeight: 'bold',
     color: '#fff',
-    marginBottom: rh(4),
+    marginBottom: responsiveHeight(0.1),
   },
   role: {
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.7),
     color: '#fff',
     opacity: 0.9,
   },
   editButton: {
-    paddingHorizontal: rp(16),
-    paddingVertical: rh(8),
-    borderRadius: rw(8),
+    paddingHorizontal: responsiveWidth(4),
+    paddingVertical: responsiveHeight(1),
+    borderRadius: responsiveWidth(2),
     borderWidth: 1,
     borderColor: '#B8E6D3',
     alignSelf: 'flex-start',
   },
   editButtonText: {
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.7),
     fontWeight: '600',
     color: '#fff',
   },
   contactInfo: {
-    // marginTop: rh(2),
+    marginTop: responsiveHeight(0.8),
   },
   contactRow: {
     flexDirection: 'row',
@@ -211,9 +218,9 @@ const styles = StyleSheet.create({
   },
   statsCard: {
     backgroundColor: '#fff',
-    marginTop: rh(-60),
+    marginTop: rh(-50),
    borderRadius: rw(20),
-    padding: rp(20),
+    padding: responsiveWidth(3),
     marginHorizontal: rp(16),
     marginBottom: rh(16),
     shadowColor: '#000',
@@ -302,6 +309,22 @@ const styles = StyleSheet.create({
   },
   bottomPadding: {
     height: rh(20),
+  },
+  logoutButton: {
+    flexDirection: 'row',
+    justifyContent: 'center',
+    gap: responsiveWidth(0.5),
+    alignItems: 'center',
+    backgroundColor: '#EF4444',
+    paddingVertical: rh(12),
+    marginHorizontal: rp(16),
+    marginBottom: rh(16),
+    borderRadius: rw(12),
+  },
+  logoutButtonText: {
+    fontSize: responsiveFontSize(1.7),
+    color: '#fff',
+    fontWeight: '600',
   },
 })
 
