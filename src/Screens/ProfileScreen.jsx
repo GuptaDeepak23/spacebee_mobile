@@ -1,10 +1,30 @@
 import React from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useNavigation, CommonActions } from '@react-navigation/native'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 
 const ProfileScreen = () => {
+  const navigation = useNavigation()
+
+  const handleLogout = async () => {
+    console.log('Logout button pressed')
+    // Delete token from storage
+    const token = await AsyncStorage.getItem('token');
+    console.log('Token:', token)
+    await AsyncStorage.removeItem('token')
+    console.log('Token deleted from storage')
+    // Navigate back to LoginScreen by resetting the root navigator
+    navigation.dispatch(
+      CommonActions.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      })
+    )
+  }
+
   return (
     <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
       {/* Profile Header - Green Section */}
@@ -53,7 +73,7 @@ const ProfileScreen = () => {
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValueGreen}>8 H</Text>
+            <Text style={styles.statValueGreen}>8</Text>
             <Text style={styles.statLabel}>Hours booked</Text>
           </View>
           <View style={styles.statDivider} />
@@ -127,11 +147,13 @@ const ProfileScreen = () => {
         </TouchableOpacity>
       </View>
 
-        <View style={styles.logoutButton}>
+        <TouchableOpacity 
+          style={styles.logoutButton}
+          onPress={handleLogout}
+        >
           <Text style={styles.logoutButtonText}>Log</Text>
           <Text style={styles.logoutButtonText}>Out</Text>
-          
-        </View>
+        </TouchableOpacity>
       {/* Bottom padding for scroll */}
       <View style={styles.bottomPadding} />
     </ScrollView>

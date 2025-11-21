@@ -2,10 +2,48 @@ import { View, Image,Text, StyleSheet } from 'react-native'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions'
 import { TextInput } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react'
 import { TouchableOpacity } from 'react-native'
-
+import { useAuth } from '../Context/Auth_Context'
+import { useNavigation } from '@react-navigation/native'
 const LoginScreen = () => {
+  const [email, setEmail] = useState('')
+  const [loading, setLoading] = useState(false)
+  const { Login } = useAuth()
+  const navigation = useNavigation()
+
+  const handleLogin = async () => {
+    console.log('Login button pressed')
+    console.log('Email entered:', email)
+    
+    if (!email || !email.trim()) {
+      console.log('Email is empty, validation failed')
+      return
+    }
+
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      console.log('Invalid email format')
+      return
+    }
+
+    setLoading(true)
+    console.log('Calling Login API...')
+    
+    try {
+      const response = await Login(email)
+      console.log('Login successful, response:', response)
+      // Navigate to OTP screen on success with email as param
+      navigation.navigate('OtpScreen', { email })
+    } catch (error) {
+      console.log('Login failed:', error)
+    } finally {
+      setLoading(false)
+      console.log('Login process completed')
+    }
+  }
+
   return (
     <SafeAreaView >
         <View style={styles.container}>
@@ -35,10 +73,27 @@ const LoginScreen = () => {
             <Text style={styles.loginTitle}>Login</Text>
             <View>
                 <Text style={styles.label}>Email</Text>
-                <TextInput style={styles.input} placeholder='Email' />
+                <TextInput 
+                  style={styles.input} 
+                  placeholder='Email' 
+                  value={email}
+                  onChangeText={(text) => {
+                    
+                    setEmail(text)
+                  }}
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  editable={!loading}
+                />
             </View>
-            <TouchableOpacity style={styles.loginButton}>
-                <Text style={styles.loginButtonText}>Log In</Text>
+            <TouchableOpacity 
+              style={[styles.loginButton, loading && styles.loginButtonDisabled]} 
+              onPress={handleLogin}
+              disabled={loading}
+            >
+                <Text style={styles.loginButtonText}>
+                  {loading ? 'Logging in...' : 'Log In'}
+                </Text>
             </TouchableOpacity>
         </View>
       </View>
@@ -170,5 +225,8 @@ const styles = StyleSheet.create({
         color:'#FFFFFF',
         fontWeight:'600',
         fontSize:responsiveFontSize(1.7),
+    },
+    loginButtonDisabled:{
+        opacity: 0.6,
     },
 })

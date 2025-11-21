@@ -29,7 +29,7 @@ export const HomeScreen = () => {
   };
   return (
     <>
-   <SafeAreaView>
+   <SafeAreaView edges={['top']}>
   
   <ScrollView>
     <View style={styles.container}>
@@ -70,11 +70,11 @@ export const HomeScreen = () => {
     <Ionicons name="filter-outline" size={responsiveFontSize(3)} color="#fff" />
   </TouchableOpacity>
 
-  {/* <View style={styles.alertContainer}>
+  <View style={styles.alertContainer}>
     <View style={styles.alertIconContainer}>
       <View style={styles.alertIconContent}>
       <View style={styles.alertIconImageContainer}>
-        <Image source={require('../../assets/Container.jpg')} style={styles.alertIcon} />
+        <Image source={require('../../assets/Group 44317.png')} style={styles.alertIcon} />
       </View>
       <View>
         <Text style={styles.nextbutton}>Next Meeting</Text>
@@ -99,7 +99,7 @@ export const HomeScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  </View> */}
+  </View>
 
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
@@ -132,7 +132,7 @@ export const HomeScreen = () => {
 
     
 
-       {/* <View style={styles.upcomingMeetingsContainer}>
+       <View style={styles.upcomingMeetingsContainer}>
         <Text style={styles.sectionTitle}>Upcoming Meetings</Text>
         <Text style={styles.viewAll}>View All</Text>
       </View>
@@ -145,7 +145,7 @@ export const HomeScreen = () => {
         <UpcomingMeetingCard title="Product Roadmap Q1 Review" date="Thu, Nov 6, 2025" time="10:00 AM - 11:30 AM" room="Conference Room" host="Deepak" />
         <UpcomingMeetingCard title="Project Status" date="Fri, 8 Nov 2025" time="12:00 AM - 1:00 AM" room="Plot Room" host="Prasad" />
         <UpcomingMeetingCard title="Team Standup" date="Mon, Nov 10, 2025" time="9:00 AM - 9:30 AM" room="Meeting Room B" host="Sarah" />
-      </ScrollView> */}
+      </ScrollView>
 
       {/* All Rooms */}
       <View style={styles.roomContainer}>
@@ -375,11 +375,11 @@ const styles = StyleSheet.create({
     },
     alertContainer:{
       backgroundColor: '#E9F9F5',
-      padding: responsiveWidth(2),
+      padding: responsiveWidth(4),
       width: responsiveWidth(100),
       marginBottom: responsiveHeight(2),
-      marginTop: responsiveHeight(2),
-      padding: responsiveWidth(2),
+      marginTop: '-4%',
+      marginHorizontal: '-3%', // Counteract container padding to extend to edges
      
     },
    alertIconContainer:{
@@ -391,19 +391,17 @@ const styles = StyleSheet.create({
    },
    alertIconContent:{
     flexDirection: 'row',
-
+    alignItems: 'center',
     gap: responsiveWidth(2),
    },
    alertIconImageContainer:{
-    backgroundColor: '#22BF96',
-
+    
+    overflow: 'hidden',
    },
     alertIcon: {
-      width: responsiveWidth(11),
-      height: responsiveHeight(5),
-      resizeMode: 'contain',
-      
-      
+      width: responsiveWidth(9),
+      height: responsiveHeight(4),
+      resizeMode: 'cover',
     },
     alertDetailsLocationContainer:{
       flexDirection: 'row',
