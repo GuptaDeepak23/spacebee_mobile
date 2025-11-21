@@ -8,8 +8,8 @@ import { useState } from 'react'
 import Bookroom from '../components/Bookroom'
 import { rw, rh, rf, rp, getScreenWidth } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
-import { SafeAreaProvider } from 'react-native-safe-area-context'
-
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import { StatusBar } from 'react-native'
 
 export const HomeScreen = () => {
 
@@ -29,7 +29,9 @@ export const HomeScreen = () => {
   };
   return (
     <>
-   <ScrollView>
+   <SafeAreaView>
+  
+  <ScrollView>
     <View style={styles.container}>
       <View style={styles.header}>
         <View style={styles.headerLeft}>
@@ -179,6 +181,8 @@ export const HomeScreen = () => {
       <RoomCard name="Collaboration Space" status="Available" capacity="5 peoples" location="1st Floor" onBookRoom={() => handleBookRoom('Collaboration Space')}/>
     </View>
    </ScrollView>
+
+   </SafeAreaView>
    <Modal
         animationType="slide"
         transparent={true}
@@ -207,8 +211,8 @@ export const HomeScreen = () => {
 
 
 const styles = StyleSheet.create({
-    container: { padding: responsiveWidth(3), backgroundColor: '#fff', paddingTop: responsiveHeight(2) },
-    header: { flexDirection: 'row', alignItems: 'center', marginVertical: responsiveHeight(2), justifyContent: 'space-between' },
+    container: { padding: responsiveWidth(3), backgroundColor: '#fff' },
+    header: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
     headerLeft: { flexDirection: 'row', alignItems: 'center' },
     avatar: { width: responsiveWidth(12), height: responsiveHeight(6), borderRadius: responsiveWidth(6), marginRight: responsiveWidth(2.5) },
     bellButton: { backgroundColor: '#E8FDF2', borderRadius: rw(30), width: rw(40), height: rh(40), alignItems: 'center', justifyContent: 'center' },
@@ -257,6 +261,7 @@ const styles = StyleSheet.create({
         borderColor: '#E0E0E0',
         borderRadius: rw(11),
         paddingHorizontal: responsiveWidth(2),
+        marginTop: responsiveHeight(2),
         
         flex: 1,
         marginBottom: responsiveHeight(),
