@@ -157,21 +157,22 @@ const styles = StyleSheet.create({
         bottom: responsiveHeight(1),
       left: responsiveWidth(4),
 
-        top: responsiveHeight(7),
+        top: responsiveHeight(5),
       
     },
     topLogoContainer:{
         position: 'relative',
     },
     spacebeeText: {
-        fontSize: responsiveFontSize(3),
+        fontSize: responsiveFontSize(3.1),
         fontStyle: 'Arial, Helvetica, sans-serif',
+        
         fontWeight: '600',
         color: '#EEEEEE',
         zIndex: 2,
     },
     spacebeeText2:{
-        fontSize: responsiveFontSize(1.5),
+        fontSize: responsiveFontSize(1.4),
         color: '#EEEEEE',
         zIndex: 2,
     },

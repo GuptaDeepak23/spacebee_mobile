@@ -1,15 +1,18 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { View, Text , ScrollView,Image ,StyleSheet,TextInput, Modal } from 'react-native'
 import { UpcomingMeetingCard } from '../components/Upcomingmeeting'
 import { RoomCard } from '../components/Roomcard'
 import { TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
 import Bookroom from '../components/Bookroom'
 import { rw, rh, rf, rp, getScreenWidth } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'react-native'
+import { useAuth } from '../Context/Auth_Context'
+import axios from 'axios'
+import base_url from '../base_url'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export const HomeScreen = () => {
 
@@ -17,6 +20,49 @@ export const HomeScreen = () => {
   const [activeTab, setActiveTab] = useState('All');
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
+  const { userData } = useAuth()
+  const [refreshUpcoming, setRefreshUpcoming] = useState(0);
+  const [stats, setStats] = useState(null);
+  const [nextmeetinginfo, setNextmeetinginfo] = useState(null);
+
+  // This function increments counter, which can be used as a trigger
+  const onRefreshUpcoming = () => setRefreshUpcoming(c => c + 1);
+
+  useEffect(() => {
+    console.log('HomeScreen - userData:', userData)
+
+    const getstats = async () => {
+      let token = await AsyncStorage.getItem('token')
+      try {
+        const response = await axios.get(`${base_url}/stats`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setStats(response.data) 
+        console.log('Stats API response:', response.data)
+      } catch (error) {
+        console.error('Error fetching stats:', error)
+      }
+    }
+
+    const nextmeetinginfo = async () => {
+      let token = await AsyncStorage.getItem('token')
+      try {
+        const response = await axios.get(`${base_url}/next-meeting`, {
+          headers: {
+            Authorization: `Bearer ${token}`
+          }
+        })
+        setNextmeetinginfo(response.data)
+      }
+      catch (error) {
+        console.error('Error fetching next meeting info:', error)
+      }
+    }
+    nextmeetinginfo()
+    getstats()
+  }, [userData])
 
   const handleBookRoom = (roomName) => {
     setSelectedRoom(roomName);
@@ -37,8 +83,8 @@ export const HomeScreen = () => {
         <View style={styles.headerLeft}>
         <Image source={{ uri: 'https://i.pravatar.cc/100' }} style={styles.avatar} />
         <View>
-          <Text style={styles.name}>Hello, Prasad</Text>
-          <Text style={styles.role}>Project Manager – Product Team</Text>
+          <Text style={styles.name}>Hello, {userData?.employee_name}</Text>
+          <Text style={styles.role}>{userData?.employee_role}</Text>
         </View>
         </View>
         <TouchableOpacity style={styles.bellButton}>
@@ -105,7 +151,7 @@ export const HomeScreen = () => {
         <View style={styles.summaryCard}>
         <View style={styles.summaryCardContent}>
           <Text style={styles.summaryTitle}>Available Rooms</Text>
-          <Text style={styles.number}>100</Text>
+          <Text style={styles.number}>{stats?.available_rooms_count}</Text>
           </View>
          <View>
          <Image
@@ -118,7 +164,7 @@ export const HomeScreen = () => {
         <View style={[styles.summaryCard, { backgroundColor: '#FFF7E0' }]}>
           <View>
           <Text style={styles.summaryTitle}>Ongoing Meetings</Text>
-          <Text style={styles.number}>15</Text>
+          <Text style={styles.number}>{stats?.ongoing_meetings_count}</Text>
           </View>
           <View>
           <Image
@@ -134,18 +180,9 @@ export const HomeScreen = () => {
 
        <View style={styles.upcomingMeetingsContainer}>
         <Text style={styles.sectionTitle}>Upcoming Meetings</Text>
-        <Text style={styles.viewAll}>View All</Text>
+        {/* <Text style={styles.viewAll}>View All</Text> */}
       </View>
-      <ScrollView 
-        horizontal 
-        showsHorizontalScrollIndicator={false}
-        style={styles.horizontalScroll}
-        contentContainerStyle={styles.horizontalScrollContent}
-      >
-        <UpcomingMeetingCard title="Product Roadmap Q1 Review" date="Thu, Nov 6, 2025" time="10:00 AM - 11:30 AM" room="Conference Room" host="Deepak" />
-        <UpcomingMeetingCard title="Project Status" date="Fri, 8 Nov 2025" time="12:00 AM - 1:00 AM" room="Plot Room" host="Prasad" />
-        <UpcomingMeetingCard title="Team Standup" date="Mon, Nov 10, 2025" time="9:00 AM - 9:30 AM" room="Meeting Room B" host="Sarah" />
-      </ScrollView>
+      <UpcomingMeetingCard refreshTrigger={refreshUpcoming} />
 
       {/* All Rooms */}
       <View style={styles.roomContainer}>
@@ -176,9 +213,7 @@ export const HomeScreen = () => {
               )
              })}
       </ScrollView>
-      <RoomCard name="Conference" status="Available" capacity="10 peoples" location="1st Floor" onBookRoom={() => handleBookRoom('Conference')}/>
-      <RoomCard name="Innovative Room" status="Occupied" capacity="5 peoples" location="1st Floor" onBookRoom={() => handleBookRoom('Innovative Room')}/>
-      <RoomCard name="Collaboration Space" status="Available" capacity="5 peoples" location="1st Floor" onBookRoom={() => handleBookRoom('Collaboration Space')}/>
+      <RoomCard onRefreshUpcoming={onRefreshUpcoming} />
     </View>
    </ScrollView>
 

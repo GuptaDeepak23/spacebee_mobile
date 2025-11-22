@@ -1,28 +1,17 @@
 import React from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { useNavigation, CommonActions } from '@react-navigation/native'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useAuth } from '../Context/Auth_Context'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
 
 const ProfileScreen = () => {
-  const navigation = useNavigation()
+  const { Logout } = useAuth()
 
   const handleLogout = async () => {
     console.log('Logout button pressed')
-    // Delete token from storage
-    const token = await AsyncStorage.getItem('token');
-    console.log('Token:', token)
-    await AsyncStorage.removeItem('token')
-    console.log('Token deleted from storage')
-    // Navigate back to LoginScreen by resetting the root navigator
-    navigation.dispatch(
-      CommonActions.reset({
-        index: 0,
-        routes: [{ name: 'LoginScreen' }],
-      })
-    )
+    await Logout()
+    // App.js will automatically detect the token removal and switch to AuthStack
   }
 
   return (
@@ -41,23 +30,18 @@ const ProfileScreen = () => {
             <Text style={styles.role}>Senior Project Manager</Text>
           </View>
 
-          <TouchableOpacity style={styles.editButton}>
-            <Text style={styles.editButtonText}>Edit Profile</Text>
-          </TouchableOpacity>
+         
         </View>
 
         {/* Contact Information */}
         <View style={styles.contactInfo}>
           <View style={styles.contactRow}>
-            <Ionicons name="mail-outline" size={rf(16)} color="#fff" />
+            <Ionicons name="mail-outline" size={responsiveFontSize(1.8)} color="#fff" />
             <Text style={styles.contactText}>testprasad@gmail.com</Text>
           </View>
+         
           <View style={styles.contactRow}>
-            <Ionicons name="call-outline" size={rf(16)} color="#fff" />
-            <Text style={styles.contactText}>+91 98765 43210</Text>
-          </View>
-          <View style={styles.contactRow}>
-            <Ionicons name="briefcase-outline" size={rf(16)} color="#fff" />
+            <Ionicons name="briefcase-outline" size={responsiveFontSize(1.8)} color="#fff" />
             <Text style={styles.contactText}>Product Management</Text>
           </View>
         </View>
@@ -74,7 +58,7 @@ const ProfileScreen = () => {
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
             <Text style={styles.statValueGreen}>8</Text>
-            <Text style={styles.statLabel}>Hours booked</Text>
+            <Text style={styles.statLabel}>Hours Booked</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
@@ -168,7 +152,7 @@ const styles = StyleSheet.create({
   },
   profileHeader: {
     backgroundColor: '#22BF96',
-    height: responsiveHeight(33),
+    height: responsiveHeight(30),
     paddingTop: responsiveHeight(5),
     paddingBottom: responsiveHeight(3),
     paddingHorizontal: responsiveWidth(4.5),
@@ -177,7 +161,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     
-    marginBottom: responsiveHeight(2),
+    marginBottom: responsiveHeight(1),
   },
   avatarContainer: {
     marginRight: responsiveWidth(3),
@@ -234,13 +218,13 @@ const styles = StyleSheet.create({
     marginBottom: rh(10),
   },
   contactText: {
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.8),
     color: '#fff',
-    marginLeft: rw(10),
+    marginLeft: responsiveWidth(1),
   },
   statsCard: {
     backgroundColor: '#fff',
-    marginTop: rh(-50),
+    marginTop: '-15%',
    borderRadius: rw(20),
     padding: responsiveWidth(3),
     marginHorizontal: rp(16),
@@ -255,14 +239,14 @@ const styles = StyleSheet.create({
     elevation: 3,
   },
   sectionTitle: {
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.7),
     fontWeight: '600',
     color: '#1E1E1E',
  
-    marginBottom: rh(16),
+    marginBottom: '3%',
   },
   sectionactivity:{
-    fontSize: rf(14),
+    fontSize: responsiveFontSize(1.4),
     fontWeight: '400',
     color: '#757575',
     paddingLeft: rp(16),
@@ -295,7 +279,7 @@ const styles = StyleSheet.create({
     marginBottom: rh(4),
   },
   statLabel: {
-    fontSize: rf(12),
+    fontSize: responsiveFontSize(1.4),
     color: '#666',
   },
   sectionCard: {

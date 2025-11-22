@@ -38,6 +38,7 @@ const OtpScreen = () => {
     setLoading(true)
     try {
       const res = await VerifyOtp(email, code)
+      console.log('Verify OTP Response:', res)
 
       if (res?.detail) {
         resetOtp()
@@ -194,7 +195,7 @@ const styles = StyleSheet.create({
     borderWidth: 1.4,
     borderRadius: responsiveWidth(2),
     textAlign: 'center',
-    fontSize: responsiveFontSize(2.3),
+    fontSize: responsiveFontSize(1.6),
   },
   activeBox: {
     borderColor: '#22BF96',
