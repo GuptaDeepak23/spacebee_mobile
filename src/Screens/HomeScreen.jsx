@@ -28,6 +28,18 @@ export const HomeScreen = () => {
   // This function increments counter, which can be used as a trigger
   const onRefreshUpcoming = () => setRefreshUpcoming(c => c + 1);
 
+  const formatTime = (isoString) => {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    hours = hours % 12;
+    hours = hours ? hours : 12;
+    const minutesStr = minutes < 10 ? '0' + minutes : minutes;
+    return `${hours}:${minutesStr} ${ampm}`;
+  };
+
   useEffect(() => {
     console.log('HomeScreen - userData:', userData)
 
@@ -60,6 +72,7 @@ export const HomeScreen = () => {
         console.error('Error fetching next meeting info:', error)
       }
     }
+    
     nextmeetinginfo()
     getstats()
   }, [userData])
@@ -116,7 +129,8 @@ export const HomeScreen = () => {
     <Ionicons name="filter-outline" size={responsiveFontSize(3)} color="#fff" />
   </TouchableOpacity>
 
-  <View style={styles.alertContainer}>
+
+{nextmeetinginfo ? ( <View style={styles.alertContainer}>
     <View style={styles.alertIconContainer}>
       <View style={styles.alertIconContent}>
       <View style={styles.alertIconImageContainer}>
@@ -124,19 +138,19 @@ export const HomeScreen = () => {
       </View>
       <View>
         <Text style={styles.nextbutton}>Next Meeting</Text>
-        <Text style={styles.alertDetailsSubtitle}>in 10 minutes</Text>
+        <Text style={styles.alertDetailsSubtitle}>in {nextmeetinginfo?.remaining_minutes} minutes</Text>
       </View>
       </View>
       <View>
-        <Text style={styles.alertDetailsTime}>10:00 AM</Text>
+        <Text style={styles.nextMeetingTime}>{formatTime(nextmeetinginfo?.start_time)}</Text>
       </View>
     </View>
     <View style={styles.alertDetailsContainer}>
       <View style={styles.alertDetailsText}>
-        <Text style={styles.alertDetailsTitle}>Product Roadmap Q1 Review</Text>
+        <Text style={styles.alertDetailsTitle}>{nextmeetinginfo?.title}</Text>
         <View style={styles.alertDetailsLocationContainer}>
           <Ionicons name="location-outline" size={responsiveFontSize(1.7)} color="#666" />
-        <Text style={styles.alertDetailsSubtitle}>Conference Room A • 3rd Floor</Text>
+        <Text style={styles.alertDetailsSubtitle}>{nextmeetinginfo?.room_name} • {nextmeetinginfo?.floor} Floor</Text>
         </View>
       </View>
       <View>
@@ -145,7 +159,8 @@ export const HomeScreen = () => {
         </TouchableOpacity>
       </View>
     </View>
-  </View>
+  </View>): ""}
+ 
 
       <View style={styles.summaryRow}>
         <View style={styles.summaryCard}>
@@ -483,6 +498,12 @@ const styles = StyleSheet.create({
     },
     alertDetailsTime:{
       fontWeight: '800',
+    },
+    nextMeetingTime: {
+      fontWeight: 'bold',
+      fontSize: 14,
+      color: '#1A1A1A',
+      marginRight: 8,
     }
 
   });

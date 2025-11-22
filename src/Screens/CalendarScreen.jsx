@@ -1,43 +1,64 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import base_url from '../base_url';
 
 const CalendarScreen = () => {
-  const [currentDate, setCurrentDate] = useState(new Date(2025, 8, 2)) // September 2025, day 2
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [calendarEvents, setCalendarEvents] = useState([]); // All events for the month
+  const [loading, setLoading] = useState(true);
+  const [selectedDay, setSelectedDay] = useState(new Date()); // show events for this day
 
-  // Sample events data - in real app, this would come from API/state
-  const events = {
-    '2025-09-02': [{ color: '#00C896', type: 'green' }], // Current day
-    '2025-09-03': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-06': [{ color: '#00C896', type: 'green' }],
-    '2025-09-08': [{ color: '#9370DB', type: 'purple' }],
-    '2025-09-10': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-13': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-15': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-17': [{ color: '#90EE90', type: 'light-green' }],
-    '2025-09-20': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-22': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
-    '2025-09-23': [{ color: '#9370DB', type: 'purple' }],
-    '2025-09-29': [{ color: '#87CEEB', type: 'light-blue' }, { color: '#87CEEB', type: 'light-blue' }],
+  // Fetch events from API whenever the month changes
+  useEffect(() => {
+    fetchCalendarEvents();
+  }, [currentDate]);
+
+  async function fetchCalendarEvents() {
+    try {
+      setLoading(true);
+      let token = await AsyncStorage.getItem('token');
+      if (!token) {
+        const userDataStr = await AsyncStorage.getItem('userData');
+        if (userDataStr) {
+          const userData = JSON.parse(userDataStr);
+          token = userData?.access_token;
+        }
+      }
+      const yyyy = currentDate.getFullYear();
+      const mm = String(currentDate.getMonth() + 1).padStart(2, '0'); // always 2-digit month
+      const url = `${base_url}/calendar?month=${yyyy}-${mm}`;
+      const res = await axios.get(url, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setCalendarEvents(Array.isArray(res.data) ? res.data : []);
+    } catch (error) {
+      setCalendarEvents([]);
+      // Optionally handle error
+    } finally {
+      setLoading(false);
+    }
   }
 
-  // Upcoming events for the list
-  const upcomingEvents = [
-    {
-      id: 1,
-      title: 'Product Roadmap Review',
-      time: '10:00 AM',
-      color: '#00C896', // Green
-    },
-    {
-      id: 2,
-      title: 'Client Meeting',
-      time: '3:00 PM',
-      color: '#87CEEB', // Light blue
-    },
-  ]
+  // Map meeting_date to the calendar for event bubbles
+  const eventsMap = {};
+  calendarEvents.forEach(event => {
+    if (!eventsMap[event.meeting_date]) eventsMap[event.meeting_date] = [];
+    eventsMap[event.meeting_date].push(event);
+  });
+
+  // Helper: which events are for currently selected day?
+  const selectedDayKey = (() => {
+    const year = selectedDay.getFullYear();
+    const month = String(selectedDay.getMonth() + 1).padStart(2, '0');
+    const day = String(selectedDay.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  })();
+  const eventsForSelectedDay = eventsMap[selectedDayKey] || [];
 
   const monthNames = [
     'January', 'February', 'March', 'April', 'May', 'June',
@@ -153,10 +174,11 @@ const CalendarScreen = () => {
       {/* Calendar Grid */}
       <View style={styles.calendarGrid}>
         {calendarDays.map((day, index) => {
-          const dateKey = formatDateKey(day.fullDate)
-          const dayEvents = events[dateKey] || []
-          const isCurrentDay = isToday(day.fullDate)
-
+          const dateKey = formatDateKey(day.fullDate);
+          // The new eventsMap:
+          const dayEvents = eventsMap[dateKey] || [];
+          const isCurrentDay = isToday(day.fullDate);
+          const isSelected = selectedDay && formatDateKey(day.fullDate) === formatDateKey(selectedDay);
           return (
             <TouchableOpacity
               key={index}
@@ -164,11 +186,13 @@ const CalendarScreen = () => {
                 styles.calendarDay,
                 !day.isCurrentMonth && styles.calendarDayOtherMonth,
               ]}
+              onPress={() => setSelectedDay(day.fullDate)}
             >
               <View
                 style={[
                   styles.dateContainer,
                   isCurrentDay && styles.dateContainerToday,
+                  isSelected && { borderWidth: 2, borderColor: '#22BF96', borderRadius: 16 },
                 ]}
               >
                 <Text
@@ -181,14 +205,13 @@ const CalendarScreen = () => {
                   {day.date}
                 </Text>
               </View>
-              
-              {/* Event Indicators */}
+              {/* Event indicator dots, if there are events on this day */}
               {dayEvents.length > 0 && (
                 <View style={styles.eventIndicators}>
                   {dayEvents.slice(0, 2).map((event, eventIndex) => (
                     <View
                       key={eventIndex}
-                      style={[styles.eventDot, { backgroundColor: event.color }]}
+                      style={[styles.eventDot, { backgroundColor: '#00C896' }]}
                     />
                   ))}
                   {dayEvents.length > 2 && (
@@ -197,24 +220,29 @@ const CalendarScreen = () => {
                 </View>
               )}
             </TouchableOpacity>
-          )
+          );
         })}
       </View>
 
       {/* Upcoming Events Section */}
       <View style={styles.eventsSection}>
-        {upcomingEvents.map((event) => (
-          <TouchableOpacity key={event.id} style={styles.eventCard}>
-            <View style={[styles.eventBar, { backgroundColor: event.color }]} />
-            <View style={styles.eventContent}>
-              <Text style={styles.eventTitle}>{event.title}</Text>
-              <Text style={styles.eventTime}>{event.time}</Text>
+        {loading ? (
+          <Text>Loading...</Text>
+        ) : eventsForSelectedDay.length === 0 ? (
+          <Text style={{ color: '#888', textAlign: 'center', padding: 16 }}>
+            No meetings today
+          </Text>
+        ) : (
+          eventsForSelectedDay.map((event, idx) => (
+            <View key={idx} style={styles.eventCard}>
+              <View style={[styles.eventBar, { backgroundColor: '#00C896' }]} />
+              <View style={styles.eventContent}>
+                <Text style={styles.eventTitle}>{event.title}</Text>
+                <Text style={styles.eventTime}>{event.start_time}</Text>
+              </View>
             </View>
-            <TouchableOpacity style={styles.viewButton}>
-              <Text style={styles.viewButtonText}>View</Text>
-            </TouchableOpacity>
-          </TouchableOpacity>
-        ))}
+          ))
+        )}
       </View>
     </ScrollView>
   )
