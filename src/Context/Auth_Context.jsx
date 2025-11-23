@@ -71,6 +71,7 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.removeItem('userData')
       // Clear userData from state
       setUserData(null)
+      navigation.navigate('LoginScreen')
       console.log('Token and userData cleared from storage')
     } catch (error) {
       console.log('Error during logout:', error)

@@ -7,52 +7,44 @@ import { AuthProvider } from "./src/Context/Auth_Context";
 import { AuthStack } from "./src/Navigations/AuthStack";
 import { Bottomtabs } from "./src/Navigations/Bottomtabs";
 
+import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+
+const queryClient = new QueryClient();
+
 export default function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     checkToken();
-    
-    // Listen for app state changes to re-check token
-    const subscription = AppState.addEventListener('change', (nextAppState) => {
-      if (nextAppState === 'active') {
+
+    // Recheck token when app comes to foreground
+    const subscription = AppState.addEventListener("change", (state) => {
+      if (state === "active") {
         checkToken();
       }
     });
 
-    // Check token periodically to catch logout events
-    // This helps detect when token is removed from AsyncStorage
-    const interval = setInterval(() => {
-      checkToken();
-    }, 500);
-
     return () => {
-      subscription?.remove();
-      clearInterval(interval);
+      subscription.remove();
     };
   }, []);
 
   const checkToken = async () => {
     try {
-      const token = await AsyncStorage.getItem('token');
-      const newAuthState = !!token;
-      if (isAuthenticated !== newAuthState) {
-        setIsAuthenticated(newAuthState);
-      }
+      const token = await AsyncStorage.getItem("token");
+      setIsAuthenticated(!!token);
     } catch (error) {
-      console.log('Error checking token:', error);
+      console.log("Error checking token:", error);
       setIsAuthenticated(false);
     } finally {
-      if (isLoading) {
-        setIsLoading(false);
-      }
+      setIsLoading(false);
     }
   };
 
   if (isLoading) {
     return (
-      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+      <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
         <ActivityIndicator size="large" color="#22BF96" />
       </View>
     );
@@ -60,11 +52,13 @@ export default function App() {
 
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
-      <AuthProvider>
-        <NavigationContainer>
-          {isAuthenticated ? <Bottomtabs /> : <AuthStack />}
-        </NavigationContainer>
-      </AuthProvider>
+      <QueryClientProvider client={queryClient}>
+        <AuthProvider>
+          <NavigationContainer>
+            {isAuthenticated ? <Bottomtabs /> : <AuthStack />}
+          </NavigationContainer>
+        </AuthProvider>
+      </QueryClientProvider>
     </GestureHandlerRootView>
-  )
+  );
 }

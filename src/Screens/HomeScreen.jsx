@@ -13,6 +13,7 @@ import { useAuth } from '../Context/Auth_Context'
 import axios from 'axios'
 import base_url from '../base_url'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useQuery } from '@tanstack/react-query'
 
 export const HomeScreen = () => {
 
@@ -22,8 +23,8 @@ export const HomeScreen = () => {
   const [selectedRoom, setSelectedRoom] = useState(null);
   const { userData } = useAuth()
   const [refreshUpcoming, setRefreshUpcoming] = useState(0);
-  const [stats, setStats] = useState(null);
-  const [nextmeetinginfo, setNextmeetinginfo] = useState(null);
+  // const [stats, setStats] = useState(null);
+  // const [nextmeetinginfo, setNextmeetinginfo] = useState(null);
 
   // This function increments counter, which can be used as a trigger
   const onRefreshUpcoming = () => setRefreshUpcoming(c => c + 1);
@@ -43,22 +44,31 @@ export const HomeScreen = () => {
   useEffect(() => {
     console.log('HomeScreen - userData:', userData)
 
-    const getstats = async () => {
-      let token = await AsyncStorage.getItem('token')
-      try {
-        const response = await axios.get(`${base_url}/stats`, {
-          headers: {
-            Authorization: `Bearer ${token}`
-          }
-        })
-        setStats(response.data) 
-        console.log('Stats API response:', response.data)
-      } catch (error) {
-        console.error('Error fetching stats:', error)
-      }
-    }
+    
 
-    const nextmeetinginfo = async () => {
+    //
+    
+    // nextmeetinginfo()
+    // getstats()
+  }, [userData])
+  const getstats = async () => {
+    let token = await AsyncStorage.getItem('token')
+    try {
+      const response = await axios.get(`${base_url}/stats`, {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      })
+      return response.data
+      // setStats(response.data) 
+      console.log('Stats API response:', response.data)
+    } catch (error) {
+      console.error('Error fetching stats:', error)
+    }
+  }
+
+
+  const nextmeetinginfo = async () => {
       let token = await AsyncStorage.getItem('token')
       try {
         const response = await axios.get(`${base_url}/next-meeting`, {
@@ -66,16 +76,40 @@ export const HomeScreen = () => {
             Authorization: `Bearer ${token}`
           }
         })
-        setNextmeetinginfo(response.data)
+        return response.data
+        // setNextmeetinginfo(response.data)
       }
       catch (error) {
         console.error('Error fetching next meeting info:', error)
       }
     }
-    
-    nextmeetinginfo()
-    getstats()
-  }, [userData])
+
+  const {
+    data: stats,
+    isLoading: statsLoading,
+    isError: statsError,
+    refetch: refetchStats
+  } = useQuery({
+    queryKey: ["stats"],
+    queryFn: getstats,
+    refetchInterval: 60000, // 🔥 auto-refresh every 30 sec
+    placeholderData: prev => prev,
+  keepPreviousData: true,
+  })
+
+  const {
+    data: nextMeetingData,
+    isLoading: nextMeetingLoading,
+    isError: nextMeetingError,
+    refetch: refetchNextMeeting
+  } = useQuery({
+    queryKey: ["next-meeting"],
+    queryFn: nextmeetinginfo,
+    refetchInterval: 60000, // 🔥 auto-refresh every 30 sec
+    placeholderData: prev => prev,
+  keepPreviousData: true,
+  });
+  
 
   const handleBookRoom = (roomName) => {
     setSelectedRoom(roomName);
@@ -130,7 +164,7 @@ export const HomeScreen = () => {
   </TouchableOpacity>
 
 
-{nextmeetinginfo ? ( <View style={styles.alertContainer}>
+{nextMeetingData  ? ( <View style={styles.alertContainer}>
     <View style={styles.alertIconContainer}>
       <View style={styles.alertIconContent}>
       <View style={styles.alertIconImageContainer}>
@@ -138,19 +172,19 @@ export const HomeScreen = () => {
       </View>
       <View>
         <Text style={styles.nextbutton}>Next Meeting</Text>
-        <Text style={styles.alertDetailsSubtitle}>in {nextmeetinginfo?.remaining_minutes} minutes</Text>
+        <Text style={styles.alertDetailsSubtitle}>in {nextMeetingData ?.remaining_minutes} minutes</Text>
       </View>
       </View>
       <View>
-        <Text style={styles.nextMeetingTime}>{formatTime(nextmeetinginfo?.start_time)}</Text>
+        <Text style={styles.nextMeetingTime}>{formatTime(nextMeetingData ?.start_time)}</Text>
       </View>
     </View>
     <View style={styles.alertDetailsContainer}>
       <View style={styles.alertDetailsText}>
-        <Text style={styles.alertDetailsTitle}>{nextmeetinginfo?.title}</Text>
+        <Text style={styles.alertDetailsTitle}>{nextMeetingData ?.title}</Text>
         <View style={styles.alertDetailsLocationContainer}>
           <Ionicons name="location-outline" size={responsiveFontSize(1.7)} color="#666" />
-        <Text style={styles.alertDetailsSubtitle}>{nextmeetinginfo?.room_name} • {nextmeetinginfo?.floor} Floor</Text>
+        <Text style={styles.alertDetailsSubtitle}>{nextMeetingData ?.room_name} • {nextMeetingData ?.floor} Floor</Text>
         </View>
       </View>
       <View>
