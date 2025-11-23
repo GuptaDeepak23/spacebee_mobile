@@ -1,13 +1,35 @@
 import React from 'react'
+import { useEffect , useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../Context/Auth_Context'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
+import AsyncStorage from '@react-native-async-storage/async-storage'
+import base_url from '../base_url'
+import axios from 'axios'
+
 
 const ProfileScreen = () => {
-  const { Logout } = useAuth()
+  const { Logout , userData } = useAuth()
 
+  const [profilestats, setProfilestats] = useState(null)
+
+useEffect(() => {
+  getProfile()
+}, [])
+
+const getProfile = async () => {
+  let token = await AsyncStorage.getItem('token')
+  try {
+    const response = await axios.get(`${base_url}/employee/statistics`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
+    setProfilestats(response.data)
+  } catch (error) {
+    console.log(error)
+  }
+}
   const handleLogout = async () => {
     console.log('Logout button pressed')
     await Logout()
@@ -21,13 +43,13 @@ const ProfileScreen = () => {
         <View style={styles.profileTop}>
           <View style={styles.avatarContainer}>
             <View style={styles.avatar}>
-              <Text style={styles.avatarText}>PS</Text>
+              <Text style={styles.avatarText}>{userData?.employee_name?.charAt(0)}</Text>
             </View>
           </View>
           
           <View style={styles.profileInfo}>
-            <Text style={styles.name}>Prasad Surve</Text>
-            <Text style={styles.role}>Senior Project Manager</Text>
+            <Text style={styles.name}>{userData?.employee_name}</Text>
+            <Text style={styles.role}>{userData?.employee_role}</Text>
           </View>
 
          
@@ -38,11 +60,12 @@ const ProfileScreen = () => {
           <View style={styles.contactRow}>
             <Ionicons name="mail-outline" size={responsiveFontSize(1.8)} color="#fff" />
             <Text style={styles.contactText}>testprasad@gmail.com</Text>
+            
           </View>
          
           <View style={styles.contactRow}>
             <Ionicons name="briefcase-outline" size={responsiveFontSize(1.8)} color="#fff" />
-            <Text style={styles.contactText}>Product Management</Text>
+            <Text style={styles.contactText}>{userData?.employee_role}</Text>
           </View>
         </View>
       </View>
@@ -52,17 +75,17 @@ const ProfileScreen = () => {
         <Text style={styles.sectionTitle}>Booking Statistics</Text>
         <View style={styles.statsRow}>
           <View style={styles.statItem}>
-            <Text style={styles.statValueGreen}>24</Text>
+            <Text style={styles.statValueGreen}>{profilestats?.total_bookings}</Text>
             <Text style={styles.statLabel}>Total Bookings</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValueGreen}>8</Text>
+            <Text style={styles.statValueGreen}>{profilestats?.hours_booked}</Text>
             <Text style={styles.statLabel}>Hours Booked</Text>
           </View>
           <View style={styles.statDivider} />
           <View style={styles.statItem}>
-            <Text style={styles.statValueRed}>2</Text>
+            <Text style={styles.statValueRed}>{profilestats?.cancelled_bookings}</Text>
             <Text style={styles.statLabel}>Cancelled</Text>
           </View>
         </View>

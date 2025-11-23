@@ -44,9 +44,9 @@ export const UpcomingMeetingCard = ({ refreshTrigger }) => {
       }
       
       console.log('Fetching upcoming meetings...')
-      const response = await axios.get(`${base_url}/bookings/my-bookings?booking_type=upcoming`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
+    const response = await axios.get(`${base_url}/bookings/my-bookings?booking_type=upcoming`, {
+      headers: { Authorization: `Bearer ${token}` }
+    })
       console.log('Upcoming meetings API response:', response.data)
       // API returns { bookings: [...] }
       const bookings = response.data?.bookings || response.data || []
@@ -146,18 +146,18 @@ export const UpcomingMeetingCard = ({ refreshTrigger }) => {
       {upcomingMeetings.map((meeting, index) => (
         <View key={meeting?.id || index} style={styles.card}>
           <Text style={styles.title}>{meeting?.title || 'Untitled Meeting'}</Text>
-          <View style={styles.row}>
-            <Feather name="calendar" size={rf(14)} color="#666" />
+      <View style={styles.row}>
+        <Feather name="calendar" size={rf(14)} color="#666" />
             <Text style={styles.text}>{formatDate(meeting?.start_time)}</Text>
-          </View>
-          <View style={styles.row}>
-            <Feather name="clock" size={rf(14)} color="#666" />
+      </View>
+      <View style={styles.row}>
+        <Feather name="clock" size={rf(14)} color="#666" />
             <Text style={styles.text}>
               {formatTimeRange(meeting?.start_time, meeting?.end_time)}
             </Text>
-          </View>
-          <View style={styles.row}>
-            <Feather name="map-pin" size={rf(14)} color="#666" />
+      </View>
+      <View style={styles.row}>
+        <Feather name="map-pin" size={rf(14)} color="#666" />
             <Text style={styles.text}>
               {meeting?.room?.name || 'Room N/A'} • Floor {meeting?.room?.floor || 'N/A'}
             </Text>
@@ -171,22 +171,22 @@ export const UpcomingMeetingCard = ({ refreshTrigger }) => {
           <View style={styles.row}>
             <Feather name="users" size={rf(14)} color="#666" />
             <Text style={styles.text}>{meeting?.participants || 0} participants</Text>
-          </View>
-          <View style={styles.line}></View>
-          <View style={styles.actions}>
+      </View>
+      <View style={styles.line}></View>
+      <View style={styles.actions}>
             <TouchableOpacity 
               style={styles.cancel} 
               onPress={() => cancelBooking(meeting?.id)}
             >
               <Text style={styles.cancelText}>Cancel</Text>
-            </TouchableOpacity>
+        </TouchableOpacity>
             <TouchableOpacity 
               style={styles.reschedule}
               onPress={() => handleReschedulePress(meeting)}
             >
               <Text style={styles.rescheduleText}>Reschedule</Text>
-            </TouchableOpacity>
-          </View>
+        </TouchableOpacity>
+      </View>
         </View>
       ))}
       {/* Show Bookroom modal for rescheduling */}
@@ -206,8 +206,8 @@ export const UpcomingMeetingCard = ({ refreshTrigger }) => {
               onBookingSuccess={getUpcomingMeetings}
               isReschedule={true}
             />
-          </View>
-        </View>
+    </View>
+    </View>
       </Modal>
     </ScrollView>
   );
