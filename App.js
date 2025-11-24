@@ -53,11 +53,13 @@ export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-        <AuthProvider>
+       
           <NavigationContainer>
+          <AuthProvider>
             {isAuthenticated ? <Bottomtabs /> : <AuthStack />}
+            </AuthProvider>
           </NavigationContainer>
-        </AuthProvider>
+       
       </QueryClientProvider>
     </GestureHandlerRootView>
   );

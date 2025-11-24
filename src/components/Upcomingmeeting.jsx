@@ -35,6 +35,7 @@ export const UpcomingMeetingCard = () => {
     );
 
     const bookings = response.data?.bookings || response.data || [];
+    
     return Array.isArray(bookings) ? bookings : [];
   };
 

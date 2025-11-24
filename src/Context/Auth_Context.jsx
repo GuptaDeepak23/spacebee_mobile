@@ -2,13 +2,14 @@ import React, { createContext, useContext , useState, useEffect } from 'react'
 import base_url from '../base_url'
 import axios from 'axios'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { useNavigation } from '@react-navigation/native'
 
 const AuthContext = createContext()
 
 
 
 export const AuthProvider = ({ children }) => {
-
+  const navigation = useNavigation()
   const [userData, setUserData] = useState(null)
 
   // Load userData from AsyncStorage on mount
@@ -71,7 +72,10 @@ export const AuthProvider = ({ children }) => {
       await AsyncStorage.removeItem('userData')
       // Clear userData from state
       setUserData(null)
-      navigation.navigate('LoginScreen')
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'LoginScreen' }],
+      })
       console.log('Token and userData cleared from storage')
     } catch (error) {
       console.log('Error during logout:', error)
