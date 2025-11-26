@@ -7,8 +7,15 @@ import { rw, rh, rf, rp } from '../utils/responsive'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import axios from 'axios'
 import base_url from '../base_url'
+import { useQueryClient } from "@tanstack/react-query";
+
+
+
 
 const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isReschedule }) => {
+
+  const queryClient = useQueryClient();
+
   // Use state with initial values from initialMeeting if available
   const [meetingTitle, setMeetingTitle] = useState(initialMeeting?.title || '');
   const [startDate, setStartDate] = useState(initialMeeting?.start_time ? new Date(initialMeeting.start_time) : new Date());
@@ -168,79 +175,83 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`
   }
 
-  const handleBookRoom = async () => {
-    try {
-      // Validate required fields
-      if (!roomId) {
-        console.error('Room ID is missing')
-        return
-      }
-      if (!meetingTitle.trim()) {
-        console.error('Meeting title is required')
-        return
-      }
-      if (!participants || isNaN(parseInt(participants))) {
-        console.error('Valid number of participants is required')
-        return
-      }
-
-      // Format dates and times to ISO format
-      const start_time = formatDateTimeISO(startDate, startingTime)
-      const end_time = formatDateTimeISO(endDate, endTime)
-
-      // Prepare booking data according to API format
-      const bookingData = {
-        room_id: roomId,
-        start_time: start_time,
-        end_time: end_time,
-        title: meetingTitle,
-        participants: parseInt(participants)
-      }
-
-      // Log the payload being sent
-      console.log('Booking Payload:', JSON.stringify(bookingData, null, 2))
-
-      const token = await AsyncStorage.getItem('token')
-      
-      let response;
-      if (isReschedule && initialMeeting?.id) {
-        // PUT for reschedule
-        response = await axios.put(
-          `${base_url}/bookings/android/${initialMeeting.id}`,
-          bookingData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-      } else {
-        // POST for new booking
-        response = await axios.post(
-          `${base_url}/bookings/android`,
-          bookingData,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json',
-            },
-          }
-        );
-      }
-      console.log('Booking API response:', response.data);
-      if (onBookingSuccess) {
-        await onBookingSuccess();
-      }
-      if (onClose) {
-        onClose();
-      }
-    } catch (error) {
-      console.error('Error booking room:', error)
-      console.error('Error response:', error.response?.data)
-      // You can add error handling/alert here
+const handleBookRoom = async () => {
+  try {
+    // 1️⃣ Validate required fields
+    if (!roomId) {
+      console.error('Room ID is missing');
+      return;
     }
+    if (!meetingTitle.trim()) {
+      console.error('Meeting title is required');
+      return;
+    }
+    if (!participants || isNaN(parseInt(participants))) {
+      console.error('Valid number of participants is required');
+      return;
+    }
+
+    // 2️⃣ Format dates and times to ISO
+    const start_time = formatDateTimeISO(startDate, startingTime);
+    const end_time = formatDateTimeISO(endDate, endTime);
+
+    // 3️⃣ Prepare booking payload
+    const bookingData = {
+      room_id: roomId,
+      start_time,
+      end_time,
+      title: meetingTitle,
+      participants: parseInt(participants),
+    };
+
+    console.log('Booking Payload:', JSON.stringify(bookingData, null, 2));
+
+    const token = await AsyncStorage.getItem('token');
+    let response;
+
+    if (isReschedule && initialMeeting?.id) {
+      // PUT for reschedule
+      response = await axios.put(
+        `${base_url}/bookings/android/${initialMeeting.id}`,
+        bookingData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+        }
+      );
+    } else {
+      // POST for new booking
+      response = await axios.post(`${base_url}/bookings/android`, bookingData, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+          'Content-Type': 'application/json',
+        },
+      });
+    }
+
+    console.log('Booking API response:', response.data);
+
+    // 4️⃣ Refresh queries globally using React Query
+    queryClient.invalidateQueries(["upcoming-meetings"]);
+    queryClient.invalidateQueries(["next-meeting"]);
+
+    // 5️⃣ Optional callback if parent still needs it
+    if (onBookingSuccess) {
+      await onBookingSuccess();
+    }
+
+    // 6️⃣ Close modal
+    if (onClose) {
+      onClose();
+    }
+  } catch (error) {
+    console.error('Error booking room:', error);
+    console.error('Error response:', error.response?.data);
   }
+};
+
 
   return (
     <View style={styles.container}>

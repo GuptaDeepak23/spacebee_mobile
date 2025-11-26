@@ -5,6 +5,7 @@ import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-nat
 import { useNavigation, useRoute } from '@react-navigation/native'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { useAuth } from '../Context/Auth_Context'
+import Toast from 'react-native-toast-message'
 
 const OtpScreen = () => {
   const navigation = useNavigation()
@@ -46,11 +47,26 @@ const OtpScreen = () => {
       }
 
       if (res?.access_token) {
-        await AsyncStorage.setItem('token', res.access_token)
-        navigation.reset({
-          index: 0,
-          routes: [{ name: 'Bottomtabs' }],
+        // Show success toast
+        const message = res?.detail || 'Login successful!'
+        Toast.show({
+          type: 'success',
+          text1: 'Success',
+          text2: message,
+          position: 'top',
+          visibilityTime: 2500,
+          topOffset: 50,
         })
+
+        await AsyncStorage.setItem('token', res.access_token)
+
+        // Delay navigation to show toast
+        setTimeout(() => {
+          navigation.reset({
+            index: 0,
+            routes: [{ name: 'Bottomtabs' }],
+          })
+        }, 2000)
       }
     } catch (err) {
       resetOtp()
@@ -60,7 +76,7 @@ const OtpScreen = () => {
   }
 
   const resetOtp = () => {
-    setOtp(['','','','','',''])
+    setOtp(['', '', '', '', '', ''])
     setCurrentIndex(0)
     setTimeout(() => inputRefs[0].current?.focus(), 100)
   }
@@ -162,6 +178,7 @@ const OtpScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
+      <Toast />
     </SafeAreaView>
   )
 }

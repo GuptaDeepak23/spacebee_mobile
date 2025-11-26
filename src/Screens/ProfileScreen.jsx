@@ -1,10 +1,10 @@
 import React from 'react'
-import { useEffect , useState } from 'react'
+import { useEffect, useState } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../Context/Auth_Context'
 import { rw, rh, rf, rp } from '../utils/responsive'
-import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
+import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import base_url from '../base_url'
 import axios from 'axios'
@@ -12,25 +12,25 @@ import axios from 'axios'
 
 
 const ProfileScreen = () => {
-  const { Logout , userData } = useAuth()
+  const { Logout, userData } = useAuth()
 
   const [profilestats, setProfilestats] = useState(null)
 
-useEffect(() => {
-  getProfile()
-}, [])
+  useEffect(() => {
+    getProfile()
+  }, [])
 
-const getProfile = async () => {
-  let token = await AsyncStorage.getItem('token')
-  try {
-    const response = await axios.get(`${base_url}/employee/statistics`, {
-      headers: { Authorization: `Bearer ${token}` }
-    })
-    setProfilestats(response.data)
-  } catch (error) {
-    console.log(error)
+  const getProfile = async () => {
+    let token = await AsyncStorage.getItem('token')
+    try {
+      const response = await axios.get(`${base_url}/employee/statistics`, {
+        headers: { Authorization: `Bearer ${token}` }
+      })
+      setProfilestats(response.data)
+    } catch (error) {
+      console.log(error)
+    }
   }
-}
   const handleLogout = async () => {
     console.log('Logout button pressed')
     await Logout()
@@ -47,23 +47,23 @@ const getProfile = async () => {
               <Text style={styles.avatarText}>{userData?.employee_name?.charAt(0)}</Text>
             </View>
           </View>
-          
+
           <View style={styles.profileInfo}>
             <Text style={styles.name}>{userData?.employee_name}</Text>
             <Text style={styles.role}>{userData?.employee_role}</Text>
           </View>
 
-         
+
         </View>
 
         {/* Contact Information */}
         <View style={styles.contactInfo}>
           <View style={styles.contactRow}>
             <Ionicons name="mail-outline" size={responsiveFontSize(1.8)} color="#fff" />
-            <Text style={styles.contactText}>testprasad@gmail.com</Text>
-            
+            <Text style={styles.contactText}>{userData?.employee_email}</Text>
+
           </View>
-         
+
           <View style={styles.contactRow}>
             <Ionicons name="briefcase-outline" size={responsiveFontSize(1.8)} color="#fff" />
             <Text style={styles.contactText}>{userData?.employee_role}</Text>
@@ -95,10 +95,10 @@ const getProfile = async () => {
       {/* My Activity Section */}
       <Text style={styles.sectionactivity}>My Activity</Text>
       <View style={styles.sectionCard}>
-        
+
         <TouchableOpacity style={styles.listItem}>
           <View style={styles.listItemLeft}>
-            <Ionicons name="checkmark-square-outline" size={rf(20)} color="#666" />
+            <Ionicons name="checkbox-outline" size={rf(20)} color="#666" />
             <Text style={styles.listItemText}>My Bookings</Text>
           </View>
           <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
@@ -116,7 +116,7 @@ const getProfile = async () => {
       {/* Support & Assistance Section - Highlighted with Blue Border */}
       <Text style={styles.sectionactivity}>Support & Assistance</Text>
       <View style={[styles.sectionCard, styles.supportCard]}>
-       
+
         <TouchableOpacity style={styles.listItem}>
           <View style={styles.listItemLeft}>
             <Ionicons name="help-circle-outline" size={rf(20)} color="#666" />
@@ -137,7 +137,7 @@ const getProfile = async () => {
       {/* Legal & Account Info Section */}
       <Text style={styles.sectionactivity}>Legal & Account Info</Text>
       <View style={styles.sectionCard}>
-    
+
         <TouchableOpacity style={styles.listItem}>
           <View style={styles.listItemLeft}>
             <Ionicons name="document-text-outline" size={rf(20)} color="#666" />
@@ -155,13 +155,13 @@ const getProfile = async () => {
         </TouchableOpacity>
       </View>
 
-        <TouchableOpacity 
-          style={styles.logoutButton}
-          onPress={handleLogout}
-        >
-          <Text style={styles.logoutButtonText}>Log</Text>
-          <Text style={styles.logoutButtonText}>Out</Text>
-        </TouchableOpacity>
+      <TouchableOpacity
+        style={styles.logoutButton}
+        onPress={handleLogout}
+      >
+        <Text style={styles.logoutButtonText}>Log</Text>
+        <Text style={styles.logoutButtonText}>Out</Text>
+      </TouchableOpacity>
       {/* Bottom padding for scroll */}
       <View style={styles.bottomPadding} />
     </ScrollView>
@@ -170,8 +170,8 @@ const getProfile = async () => {
 
 const styles = StyleSheet.create({
   container: {
-    
-    
+
+
     backgroundColor: '#F5F5F5',
   },
   profileHeader: {
@@ -184,7 +184,7 @@ const styles = StyleSheet.create({
   profileTop: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    
+
     marginBottom: responsiveHeight(1),
   },
   avatarContainer: {
@@ -249,7 +249,7 @@ const styles = StyleSheet.create({
   statsCard: {
     backgroundColor: '#fff',
     marginTop: '-15%',
-   borderRadius: rw(20),
+    borderRadius: rw(20),
     padding: responsiveWidth(3),
     marginHorizontal: rp(16),
     marginBottom: rh(16),
@@ -266,10 +266,10 @@ const styles = StyleSheet.create({
     fontSize: responsiveFontSize(1.7),
     fontWeight: '600',
     color: '#1E1E1E',
- 
+
     marginBottom: '3%',
   },
-  sectionactivity:{
+  sectionactivity: {
     fontSize: responsiveFontSize(1.4),
     fontWeight: '400',
     color: '#757575',
@@ -312,9 +312,9 @@ const styles = StyleSheet.create({
     marginBottom: rh(16),
     borderRadius: rw(12),
     padding: rp(16),
- 
+
   },
-  
+
   listItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -335,7 +335,7 @@ const styles = StyleSheet.create({
     height: 1,
     width: '100%',
     backgroundColor: '#E9ECEF',
-    
+
   },
   bottomPadding: {
     height: rh(20),

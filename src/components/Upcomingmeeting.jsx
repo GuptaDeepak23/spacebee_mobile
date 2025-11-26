@@ -10,13 +10,11 @@ import base_url from '../base_url';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import Bookroom from './Bookroom';
 import { useQuery } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
-export const UpcomingMeetingCard = () => {
-
-  const [rescheduleModalVisible, setRescheduleModalVisible] = useState(false);
-  const [selectedMeeting, setSelectedMeeting] = useState(null);
-
-  // 🔥 FINAL React Query version (no refreshTrigger, no useEffect)
+// 🔥 Custom hook to fetch upcoming meetings (can be used in parent components)
+export const useUpcomingMeetings = () => {
+  
   const getUpcomingMeetings = async () => {
     let token = await AsyncStorage.getItem('token');
 
@@ -35,22 +33,33 @@ export const UpcomingMeetingCard = () => {
     );
 
     const bookings = response.data?.bookings || response.data || [];
-    
+
     return Array.isArray(bookings) ? bookings : [];
   };
 
+  return useQuery({
+    queryKey: ["upcoming-meetings"],
+    queryFn: getUpcomingMeetings,
+    refetchInterval: 60000,
+    placeholderData: prev => prev,
+    keepPreviousData: true,
+  });
+};
+
+export const UpcomingMeetingCard = () => {
+
+  const queryClient = useQueryClient();
+
+  const [rescheduleModalVisible, setRescheduleModalVisible] = useState(false);
+  const [selectedMeeting, setSelectedMeeting] = useState(null);
+
+  // Use the custom hook
   const {
     data: upcomingMeetings,
     isLoading: upcomingMeetingsLoading,
     isError: upcomingMeetingsError,
     refetch: refetchUpcomingMeetings
-  } = useQuery({
-    queryKey: ["upcoming-meetings"],
-    queryFn: getUpcomingMeetings,
-    refetchInterval: 60000,    
-    placeholderData: prev => prev,
-    keepPreviousData: true,    
-  });
+  } = useUpcomingMeetings();
 
   // 🔥 Cancel Booking + Refresh
   const cancelBooking = async (bookingId) => {
@@ -62,6 +71,8 @@ export const UpcomingMeetingCard = () => {
       });
 
       // Refresh UI
+      queryClient.invalidateQueries(["upcoming-meetings"]);
+    queryClient.invalidateQueries(["next-meeting"]);
       refetchUpcomingMeetings();
 
     } catch (error) {
@@ -100,13 +111,6 @@ export const UpcomingMeetingCard = () => {
     return <ActivityIndicator size="small" color="#00C896" />;
   }
 
-  if (!upcomingMeetings || upcomingMeetings.length === 0) {
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No upcoming meetings</Text>
-      </View>
-    );
-  }
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false} contentContainerStyle={styles.scrollContent}>
@@ -167,7 +171,7 @@ export const UpcomingMeetingCard = () => {
               roomId={selectedMeeting?.room?.id}
               initialMeeting={selectedMeeting}
               onClose={closeRescheduleModal}
-              onBookingSuccess={refetchUpcomingMeetings}
+              onBookingSuccess={() => refetchUpcomingMeetings()}
               isReschedule={true}
             />
           </View>

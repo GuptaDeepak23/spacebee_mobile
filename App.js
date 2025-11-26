@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { View, ActivityIndicator, AppState } from "react-native";
+import { View, ActivityIndicator } from "react-native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { AuthProvider } from "./src/Context/Auth_Context";
+import { AuthProvider, useAuth } from "./src/Context/Auth_Context";
 import { AuthStack } from "./src/Navigations/AuthStack";
 import { Bottomtabs } from "./src/Navigations/Bottomtabs";
 
@@ -11,36 +11,19 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
 const queryClient = new QueryClient();
 
-export default function App() {
-  const [isAuthenticated, setIsAuthenticated] = useState(null);
+// Create a wrapper component that uses the auth context
+function AppNavigator() {
+  const { userData } = useAuth();
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
-    checkToken();
-
-    // Recheck token when app comes to foreground
-    const subscription = AppState.addEventListener("change", (state) => {
-      if (state === "active") {
-        checkToken();
-      }
-    });
-
-    return () => {
-      subscription.remove();
-    };
-  }, []);
-
-  const checkToken = async () => {
-    try {
-      const token = await AsyncStorage.getItem("token");
-      setIsAuthenticated(!!token);
-    } catch (error) {
-      console.log("Error checking token:", error);
-      setIsAuthenticated(false);
-    } finally {
+    // Give time for userData to load from AsyncStorage
+    const timer = setTimeout(() => {
       setIsLoading(false);
-    }
-  };
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, []);
 
   if (isLoading) {
     return (
@@ -50,16 +33,21 @@ export default function App() {
     );
   }
 
+  // Check if user is authenticated based on userData
+  const isAuthenticated = userData && userData.access_token;
+
+  return isAuthenticated ? <Bottomtabs /> : <AuthStack />;
+}
+
+export default function App() {
   return (
     <GestureHandlerRootView style={{ flex: 1 }}>
       <QueryClientProvider client={queryClient}>
-       
-          <NavigationContainer>
+        <NavigationContainer>
           <AuthProvider>
-            {isAuthenticated ? <Bottomtabs /> : <AuthStack />}
-            </AuthProvider>
-          </NavigationContainer>
-       
+            <AppNavigator />
+          </AuthProvider>
+        </NavigationContainer>
       </QueryClientProvider>
     </GestureHandlerRootView>
   );
