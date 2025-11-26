@@ -184,7 +184,7 @@ export const UpcomingMeetingCard = () => {
 const styles = StyleSheet.create({
   emptyContainer: { padding: 20, alignItems: "center" },
   emptyText: { color: "#666" },
-  scrollContent: { paddingRight: 16 },
+  scrollContent: { paddingRight: 16 },  
   card: {
     backgroundColor: "#fff",
     padding: 16,
