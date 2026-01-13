@@ -1,7 +1,8 @@
 import React, { createContext, useContext, useState, useEffect } from 'react'
 import base_url from '../base_url'
-import axios from 'axios'
+import { useRequestOtp, useVerifyOtp } from '../Api/use.api'
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import apiClient from '../apiClient'
 
 const AuthContext = createContext()
 
@@ -11,6 +12,22 @@ export const AuthProvider = ({ children }) => {
   // Load userData from AsyncStorage on mount
   useEffect(() => {
     loadUserData()
+
+    // Global 401 interceptor setup
+    const responseInterceptor = apiClient.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        if (error.response?.status === 401) {
+          console.log('Unauthorized (401) detected. Logging out...')
+          await Logout()
+        }
+        return Promise.reject(error)
+      }
+    )
+
+    return () => {
+      apiClient.interceptors.response.eject(responseInterceptor)
+    }
   }, [])
 
   const loadUserData = async () => {
@@ -26,38 +43,27 @@ export const AuthProvider = ({ children }) => {
     }
   }
 
+  const { mutateAsync: requestOtpMutation } = useRequestOtp()
+  const { mutateAsync: verifyOtpMutation } = useVerifyOtp()
+
   const Login = async (email) => {
-    try {
-      console.log('Login API called with email:', email)
-      console.log('API URL:', `${base_url}/auth/employee/request-otp`)
-      const response = await axios.post(`${base_url}/auth/employee/request-otp`, { email })
-      console.log('Login API response:', response.data)
-      return response.data
-    } catch (error) {
-      console.log('Login API error:', error)
-      console.log('Error response:', error.response?.data)
-      return error.response?.data
-    }
+    console.log('Login API called with email:', email)
+    const data = await requestOtpMutation(email)
+    console.log('Login API response:', data)
+    return data
   }
 
   const VerifyOtp = async (email, otp) => {
-    try {
-      console.log('Verify OTP API called with email:', email, 'and OTP:', otp)
-      console.log('API URL:', `${base_url}/auth/employee/login`)
-      const response = await axios.post(`${base_url}/auth/employee/login`, { email, otp })
-      console.log('Verify OTP API response:', response.data)
+    console.log('Verify OTP API called with email:', email, 'and OTP:', otp)
+    const data = await verifyOtpMutation({ email, otp })
+    console.log('Verify OTP API response:', data)
 
-      // Set userData in state and persist to AsyncStorage
-      setUserData(response.data)
-      await AsyncStorage.setItem('userData', JSON.stringify(response.data))
-      console.log('UserData set in context and stored:', response.data)
+    // Set userData in state and persist to AsyncStorage
+    setUserData(data)
+    await AsyncStorage.setItem('userData', JSON.stringify(data))
+    console.log('UserData set in context and stored:', data)
 
-      return response.data
-    } catch (error) {
-      console.log('Verify OTP API error:', error)
-      console.log('Error response:', error.response?.data)
-      return error.response?.data
-    }
+    return data
   }
 
   const Logout = async () => {

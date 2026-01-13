@@ -2,47 +2,17 @@ import React, { useState, useEffect } from 'react'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { rw, rh, rf, rp } from '../utils/responsive'
-import {responsiveFontSize,responsiveWidth,responsiveHeight} from 'react-native-responsive-dimensions'
-import axios from 'axios';
+import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions'
+import { useCalendarEvents } from '../Api/use.api';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import base_url from '../base_url';
+
 
 const CalendarScreen = () => {
   const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendarEvents, setCalendarEvents] = useState([]); // All events for the month
-  const [loading, setLoading] = useState(true);
   const [selectedDay, setSelectedDay] = useState(new Date()); // show events for this day
-
-  // Fetch events from API whenever the month changes
-  useEffect(() => {
-    fetchCalendarEvents();
-  }, [currentDate]);
-
-  async function fetchCalendarEvents() {
-    try {
-      setLoading(true);
-      let token = await AsyncStorage.getItem('token');
-      if (!token) {
-        const userDataStr = await AsyncStorage.getItem('userData');
-        if (userDataStr) {
-          const userData = JSON.parse(userDataStr);
-          token = userData?.access_token;
-        }
-      }
-      const yyyy = currentDate.getFullYear();
-      const mm = String(currentDate.getMonth() + 1).padStart(2, '0'); // always 2-digit month
-      const url = `${base_url}/calendar?month=${yyyy}-${mm}`;
-      const res = await axios.get(url, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      setCalendarEvents(Array.isArray(res.data) ? res.data : []);
-    } catch (error) {
-      setCalendarEvents([]);
-      // Optionally handle error
-    } finally {
-      setLoading(false);
-    }
-  }
+  const yyyy = currentDate.getFullYear();
+  const mm = String(currentDate.getMonth() + 1).padStart(2, '0'); // always 2-digit month
+  const { data: calendarEvents = [], isLoading: loading } = useCalendarEvents(`${yyyy}-${mm}`);
 
   // Map meeting_date to the calendar for event bubbles
   const eventsMap = {};
@@ -151,7 +121,7 @@ const CalendarScreen = () => {
         <TouchableOpacity onPress={goToPreviousMonth} style={styles.navButton}>
           <Ionicons name="chevron-back" size={rf(20)} color="#666" />
         </TouchableOpacity>
-        
+
         <View style={styles.monthTextContainer}>
           <Text style={styles.monthText}>{currentMonth}</Text>
           <Text style={styles.yearText}>{currentYear}</Text>
@@ -314,7 +284,7 @@ const styles = StyleSheet.create({
     marginBottom: rh(20),
   },
   calendarDay: {
-    width: responsiveWidth(12.9) ,
+    width: responsiveWidth(12.9),
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingVertical: rh(8),

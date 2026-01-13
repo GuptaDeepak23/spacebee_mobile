@@ -1,4 +1,6 @@
+import "./global.css"
 import React, { useState, useEffect } from "react";
+
 import { NavigationContainer } from "@react-navigation/native";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { View, ActivityIndicator } from "react-native";
@@ -6,6 +8,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import { AuthProvider, useAuth } from "./src/Context/Auth_Context";
 import { AuthStack } from "./src/Navigations/AuthStack";
 import { Bottomtabs } from "./src/Navigations/Bottomtabs";
+import Toast from 'react-native-toast-message';
+import CustomToast from './src/components/CustomToast';
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
@@ -49,6 +53,7 @@ export default function App() {
           </AuthProvider>
         </NavigationContainer>
       </QueryClientProvider>
+      <Toast config={CustomToast} />
     </GestureHandlerRootView>
   );
 }

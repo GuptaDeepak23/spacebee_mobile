@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { rw, rh, rf } from '../utils/responsive';
@@ -7,82 +7,29 @@ import {
   responsiveWidth,
   responsiveHeight,
 } from 'react-native-responsive-dimensions';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import base_url from '../base_url';
-import axios from 'axios';
+import { useMyBookings } from '../Api/use.api';
 
 const MyBookingScreen = () => {
   const tabs = ['All', 'Upcoming', 'Past', 'Cancelled'];
   const [activeTab, setActiveTab] = useState('All');
 
-  const [upcomingbookings, setUpcomingbookings] = useState([]);
-  const [pastbookings, setPastbookings] = useState([]);
-  const [cancelledbookings, setCancelledbookings] = useState([]);
+  const { data: upcomingData } = useMyBookings('upcoming');
+  const { data: pastData } = useMyBookings('previous');
+  const { data: cancelledData } = useMyBookings('cancelled');
 
-  useEffect(() => {
-    getUpcomingbookings();
-    getPastbookings();
-    getCancelledbookings();
-  }, []);
-
-  // 🔥 FIXED FUNCTION — ALWAYS TAKE response.data.bookings
-  const getUpcomingbookings = async () => {
-    let token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.get(
-        `${base_url}/bookings/my-bookings?booking_type=upcoming`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const bookings = response.data.bookings;
-      setUpcomingbookings(Array.isArray(bookings) ? bookings : []);
-    } catch (error) {
-      console.log(error);
-      setUpcomingbookings([]);
-    }
-  };
-
-  const getPastbookings = async () => {
-    let token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.get(
-        `${base_url}/bookings/my-bookings?booking_type=previous`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const bookings = response.data.bookings;
-      setPastbookings(Array.isArray(bookings) ? bookings : []);
-    } catch (error) {
-      console.log(error);
-      setPastbookings([]);
-    }
-  };
-
-  const getCancelledbookings = async () => {
-    let token = await AsyncStorage.getItem('token');
-    try {
-      const response = await axios.get(
-        `${base_url}/bookings/my-bookings?booking_type=cancelled`,
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      const bookings = response.data.bookings;
-      setCancelledbookings(Array.isArray(bookings) ? bookings : []);
-    } catch (error) {
-      console.log(error);
-      setCancelledbookings([]);
-    }
-  };
+  const upcomingbookings = upcomingData?.bookings || [];
+  const pastbookings = pastData?.bookings || [];
+  const cancelledbookings = cancelledData?.bookings || [];
 
   // FILTERING FIXED
   const filteredBookings =
     activeTab === 'All'
       ? [...upcomingbookings, ...pastbookings, ...cancelledbookings]
       : activeTab === 'Upcoming'
-      ? upcomingbookings
-      : activeTab === 'Past'
-      ? pastbookings
-      : cancelledbookings;
+        ? upcomingbookings
+        : activeTab === 'Past'
+          ? pastbookings
+          : cancelledbookings;
 
   const formatDate = (dateStr) => {
     if (!dateStr) return '';
@@ -135,9 +82,10 @@ const MyBookingScreen = () => {
               {/* Title + Status */}
               <View style={styles.cardHeader}>
                 <Text style={styles.meetingTitle}>{booking.title}</Text>
-
-                <View style={styles.statusBadge}>
-                  <Text style={styles.statusText}>{booking.status}</Text>
+                <View style={styles.statusContainer}>
+                  <View style={styles.statusBadge}>
+                    <Text style={styles.statusText}>{booking.status}</Text>
+                  </View>
                 </View>
               </View>
 
@@ -166,15 +114,17 @@ const MyBookingScreen = () => {
               </View>
 
               {/* Buttons */}
-              <View style={styles.actionButtons}>
-                <TouchableOpacity style={styles.cancelButton}>
-                  <Text style={styles.cancelButtonText}>Cancel</Text>
-                </TouchableOpacity>
+              {booking.status !== 'Cancelled' && booking.status !== 'Completed' && (
+                <View style={styles.actionButtons}>
+                  <TouchableOpacity style={styles.cancelButton} >
+                    <Text style={styles.cancelButtonText}>Cancel</Text>
+                  </TouchableOpacity>
 
-                <TouchableOpacity style={styles.rescheduleButton}>
-                  <Text style={styles.rescheduleButtonText}>Reschedule</Text>
-                </TouchableOpacity>
-              </View>
+                  <TouchableOpacity style={styles.rescheduleButton}  >
+                    <Text style={styles.rescheduleButtonText}>Reschedule</Text>
+                  </TouchableOpacity>
+                </View>
+              )}
             </View>
           ))
         ) : (
@@ -247,6 +197,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     marginBottom: responsiveHeight(1),
+
   },
   meetingTitle: {
     fontWeight: '700',
@@ -254,12 +205,18 @@ const styles = StyleSheet.create({
     color: '#1A1A1A',
     flex: 1,
   },
+  statusContainer: {
+    position: 'relative',
+  },
   statusBadge: {
-    backgroundColor: '#00C896',
-    paddingHorizontal: responsiveWidth(3.5),
-    paddingVertical: responsiveHeight(0.7),
-    borderTopLeftRadius: rw(20),
-    borderBottomLeftRadius: rw(20),
+    position: 'absolute',
+    top: 16,
+    right: -16,
+    paddingHorizontal: 10,
+    paddingVertical: 4,
+    borderTopLeftRadius: 20,
+    borderBottomLeftRadius: 20,
+    backgroundColor: '#00C896'
   },
   statusText: {
     color: '#fff',
@@ -282,6 +239,9 @@ const styles = StyleSheet.create({
   actionButtons: {
     flexDirection: 'row',
   },
+  cancelButtonDisabled: {
+    backgroundColor: '#BDBDBD', // grey when disabled
+  },
   cancelButton: {
     flex: 1,
     paddingVertical: rh(10),
@@ -303,6 +263,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#22BF96',
     alignItems: 'center',
+
   },
   rescheduleButtonText: {
     color: '#00C896',

@@ -2,51 +2,20 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions';
-import axios from 'axios';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import base_url from '../base_url';
+import { useRoomsStatus } from '../Api/use.api';
 import Bookroom from './Bookroom';
-import { useQuery } from '@tanstack/react-query';
 
 export const RoomCard = ({ onRefreshUpcoming }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
   const [selectedRoomId, setSelectedRoomId] = useState(null);
 
-  const getRooms = async () => {
-    let token = await AsyncStorage.getItem('token');
-
-    if (!token) {
-      const userDataStr = await AsyncStorage.getItem('userData');
-      if (userDataStr) {
-        const userData = JSON.parse(userDataStr);
-        token = userData?.access_token;
-      }
-    }
-
-    const response = await axios.get(`${base_url}/bookings/rooms/status`, {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    return Array.isArray(response.data) ? response.data : [];
-  };
-
   const {
     data: rooms = [],
     isLoading: roomsLoading,
     isError: roomsError,
     refetch: refetchRooms,
-  } = useQuery({
-    queryKey: ["rooms"],
-    queryFn: getRooms,
-
-    // 🔥 prevents UI flicker
-    keepPreviousData: true,
-    placeholderData: (prev) => prev,
-
-    // 🔄 optional auto refresh (30 sec)
-    refetchInterval: 60000,
-  });
+  } = useRoomsStatus();
 
   const handleBookRoom = (room) => {
     setSelectedRoom(room?.name);
@@ -162,6 +131,7 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#E9ECEF',
+
   },
   statusContainer: {
     position: 'absolute',

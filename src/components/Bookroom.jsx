@@ -5,9 +5,10 @@ import { Calendar } from 'react-native-calendars'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import axios from 'axios'
-import base_url from '../base_url'
+import { useBookRoom, useRescheduleBooking } from '../Api/use.api'
 import { useQueryClient } from "@tanstack/react-query";
+import Toast from 'react-native-toast-message';
+import CustomToast from './CustomToast'
 
 
 
@@ -15,6 +16,8 @@ import { useQueryClient } from "@tanstack/react-query";
 const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isReschedule }) => {
 
   const queryClient = useQueryClient();
+  const { mutateAsync: bookMutation } = useBookRoom();
+  const { mutateAsync: rescheduleMutation } = useRescheduleBooking();
 
   // Use state with initial values from initialMeeting if available
   const [meetingTitle, setMeetingTitle] = useState(initialMeeting?.title || '');
@@ -23,13 +26,13 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
   const [startingTime, setStartingTime] = useState(initialMeeting?.start_time ? new Date(initialMeeting.start_time) : new Date());
   const [endTime, setEndTime] = useState(initialMeeting?.end_time ? new Date(initialMeeting.end_time) : new Date());
   const [participants, setParticipants] = useState(initialMeeting?.participants ? initialMeeting.participants.toString() : '5');
-  
+
   // Picker visibility states
   const [showStartDatePicker, setShowStartDatePicker] = useState(false)
   const [showEndDatePicker, setShowEndDatePicker] = useState(false)
   const [showStartTimePicker, setShowStartTimePicker] = useState(false)
   const [showEndTimePicker, setShowEndTimePicker] = useState(false)
-  
+
   // Temporary picker values
   const [tempDate, setTempDate] = useState(new Date())
   const [tempTime, setTempTime] = useState(new Date())
@@ -122,7 +125,7 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
     }
     setPickerType(null)
   }
-  
+
   // For iOS, handle the confirm button separately
   const handleTimeConfirm = () => {
     confirmTimeSelection()
@@ -159,98 +162,108 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
   const formatDateTimeISO = (date, time) => {
     const dateObj = new Date(date)
     const timeObj = new Date(time)
-    
+
     // Get date components
     const year = dateObj.getFullYear()
     const month = String(dateObj.getMonth() + 1).padStart(2, '0')
     const day = String(dateObj.getDate()).padStart(2, '0')
-    
+
     // Get time components
     const hours = String(timeObj.getHours()).padStart(2, '0')
     const minutes = String(timeObj.getMinutes()).padStart(2, '0')
     const seconds = String(timeObj.getSeconds()).padStart(2, '0')
-    
+
     // Create ISO format string: YYYY-MM-DDTHH:mm:ssZ
     // Using 'Z' to indicate UTC (or you can use local timezone offset)
     return `${year}-${month}-${day}T${hours}:${minutes}:${seconds}Z`
   }
 
-const handleBookRoom = async () => {
-  try {
-    // 1️⃣ Validate required fields
-    if (!roomId) {
-      console.error('Room ID is missing');
-      return;
-    }
-    if (!meetingTitle.trim()) {
-      console.error('Meeting title is required');
-      return;
-    }
-    if (!participants || isNaN(parseInt(participants))) {
-      console.error('Valid number of participants is required');
-      return;
-    }
+  const handleBookRoom = async () => {
+    try {
+      // 1️⃣ Validate required fields
+      if (!roomId) {
+        Toast.show({
+          type: 'error',
+          text1: 'Error',
+          text2: 'Room ID is missing',
+        });
+        console.error('Room ID is missing');
+        return;
+      }
+      if (!meetingTitle.trim()) {
+        Toast.show({
+          type: 'error',
+          text1: 'Validation Error',
+          text2: 'Meeting title is required',
+        });
+        console.error('Meeting title is required');
+        return;
+      }
+      if (!participants || isNaN(parseInt(participants))) {
+        Toast.show({
+          type: 'error',
+          text1: 'Validation Error',
+          text2: 'Valid number of participants is required',
+        });
+        console.error('Valid number of participants is required');
+        return;
+      }
 
-    // 2️⃣ Format dates and times to ISO
-    const start_time = formatDateTimeISO(startDate, startingTime);
-    const end_time = formatDateTimeISO(endDate, endTime);
+      // 2️⃣ Format dates and times to ISO
+      const start_time = formatDateTimeISO(startDate, startingTime);
+      const end_time = formatDateTimeISO(endDate, endTime);
 
-    // 3️⃣ Prepare booking payload
-    const bookingData = {
-      room_id: roomId,
-      start_time,
-      end_time,
-      title: meetingTitle,
-      participants: parseInt(participants),
-    };
+      // 3️⃣ Prepare booking payload
+      const bookingData = {
+        room_id: roomId,
+        start_time,
+        end_time,
+        title: meetingTitle,
+        participants: parseInt(participants),
+      };
 
-    console.log('Booking Payload:', JSON.stringify(bookingData, null, 2));
+      console.log('Booking Payload:', JSON.stringify(bookingData, null, 2));
 
-    const token = await AsyncStorage.getItem('token');
-    let response;
+      let responseData;
+      if (isReschedule && initialMeeting?.id) {
+        // PUT for reschedule
+        responseData = await rescheduleMutation({ bookingId: initialMeeting.id, bookingData });
+      } else {
+        // POST for new booking
+        responseData = await bookMutation(bookingData);
+      }
 
-    if (isReschedule && initialMeeting?.id) {
-      // PUT for reschedule
-      response = await axios.put(
-        `${base_url}/bookings/android/${initialMeeting.id}`,
-        bookingData,
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      );
-    } else {
-      // POST for new booking
-      response = await axios.post(`${base_url}/bookings/android`, bookingData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
+      console.log('Booking API response:', responseData);
+
+      Toast.show({
+        type: 'success',
+        text1: 'Success',
+        text2: isReschedule ? 'Meeting rescheduled successfully!' : 'Meeting booked successfully!',
+      });
+
+      // 4️⃣ Refresh queries globally using React Query
+      queryClient.invalidateQueries(["upcoming-meetings"]);
+      queryClient.invalidateQueries(["next-meeting"]);
+
+      // 5️⃣ Optional callback if parent still needs it
+      if (onBookingSuccess) {
+        await onBookingSuccess();
+      }
+
+      // 6️⃣ Close modal
+      if (onClose) {
+        onClose();
+      }
+    } catch (error) {
+      console.error('Error booking room:', error);
+      console.error('Error response:', error.response?.data);
+      Toast.show({
+        type: 'error',
+        text1: 'Booking Failed',
+        text2: error.response?.data?.detail || 'Something went wrong',
       });
     }
-
-    console.log('Booking API response:', response.data);
-
-    // 4️⃣ Refresh queries globally using React Query
-    queryClient.invalidateQueries(["upcoming-meetings"]);
-    queryClient.invalidateQueries(["next-meeting"]);
-
-    // 5️⃣ Optional callback if parent still needs it
-    if (onBookingSuccess) {
-      await onBookingSuccess();
-    }
-
-    // 6️⃣ Close modal
-    if (onClose) {
-      onClose();
-    }
-  } catch (error) {
-    console.error('Error booking room:', error);
-    console.error('Error response:', error.response?.data);
-  }
-};
+  };
 
 
   return (
@@ -502,7 +515,7 @@ const styles = StyleSheet.create({
   },
   inputGroup: {
     marginBottom: rh(10),
-    
+
   },
   label: {
     fontSize: rf(14),

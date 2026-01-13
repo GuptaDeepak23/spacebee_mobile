@@ -11,6 +11,7 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
+    
     "ios": {
       "supportsTablet": true
     },
@@ -23,16 +24,20 @@
       "permissions": [
         "INTERNET",
         "ACCESS_NETWORK_STATE"
-        
       ]
     },
     "web": {
-      "favicon": "./assets/Spacebee logo.png"
+      "favicon": "./assets/Spacebee logo.png",
+        "bundler": "metro"
     },
     "extra": {
       "eas": {
-        "projectId": ""
+        "projectId": "b4377c17-b589-4c2f-9d28-49f8b2ebff05"
       }
-    }
+    },
+    "plugins": [
+      "expo-font",
+      "@react-native-community/datetimepicker"
+    ]
   }
 }

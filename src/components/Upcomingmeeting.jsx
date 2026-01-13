@@ -5,78 +5,53 @@ import {
 } from 'react-native';
 import { Feather } from '@expo/vector-icons';
 import { rw, rh, rf, rp, getScreenWidth } from '../utils/responsive';
-import axios from 'axios';
-import base_url from '../base_url';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useMyBookings, useCancelBooking } from '../Api/use.api';
 import Bookroom from './Bookroom';
-import { useQuery } from '@tanstack/react-query';
-import { useQueryClient } from '@tanstack/react-query';
+import Toast from 'react-native-toast-message';
 
 // 🔥 Custom hook to fetch upcoming meetings (can be used in parent components)
 export const useUpcomingMeetings = () => {
-  
-  const getUpcomingMeetings = async () => {
-    let token = await AsyncStorage.getItem('token');
-
-    if (!token) {
-      const userDataStr = await AsyncStorage.getItem('userData');
-      if (userDataStr) {
-        token = JSON.parse(userDataStr)?.access_token;
-      }
-    }
-
-    if (!token) return [];
-
-    const response = await axios.get(
-      `${base_url}/bookings/my-bookings?booking_type=upcoming`,
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    const bookings = response.data?.bookings || response.data || [];
-
-    return Array.isArray(bookings) ? bookings : [];
-  };
-
-  return useQuery({
-    queryKey: ["upcoming-meetings"],
-    queryFn: getUpcomingMeetings,
-    refetchInterval: 60000,
-    placeholderData: prev => prev,
-    keepPreviousData: true,
-  });
+  return useMyBookings('upcoming');
 };
 
 export const UpcomingMeetingCard = () => {
 
-  const queryClient = useQueryClient();
+
 
   const [rescheduleModalVisible, setRescheduleModalVisible] = useState(false);
   const [selectedMeeting, setSelectedMeeting] = useState(null);
 
   // Use the custom hook
   const {
-    data: upcomingMeetings,
+    data: upcomingMeetingsData,
     isLoading: upcomingMeetingsLoading,
     isError: upcomingMeetingsError,
     refetch: refetchUpcomingMeetings
   } = useUpcomingMeetings();
 
+  const upcomingMeetings = upcomingMeetingsData?.bookings || [];
+
+  // 🔥 Cancel Booking + Refresh
+  const { mutateAsync: cancelBookingMutation } = useCancelBooking();
+
   // 🔥 Cancel Booking + Refresh
   const cancelBooking = async (bookingId) => {
     try {
-      const token = await AsyncStorage.getItem('token');
+      await cancelBookingMutation(bookingId);
 
-      await axios.delete(`${base_url}/bookings/${bookingId}`, {
-        headers: { Authorization: `Bearer ${token}` }
+      Toast.show({
+        type: 'info',
+        text1: 'Cancelled',
+        text2: 'Meeting has been cancelled successfully.',
       });
-
-      // Refresh UI
-      queryClient.invalidateQueries(["upcoming-meetings"]);
-    queryClient.invalidateQueries(["next-meeting"]);
-      refetchUpcomingMeetings();
 
     } catch (error) {
       console.error("Cancel error:", error);
+      Toast.show({
+        type: 'error',
+        text1: 'Error',
+        text2: 'Failed to cancel the meeting.',
+      });
     }
   };
 
@@ -184,7 +159,7 @@ export const UpcomingMeetingCard = () => {
 const styles = StyleSheet.create({
   emptyContainer: { padding: 20, alignItems: "center" },
   emptyText: { color: "#666" },
-  scrollContent: { paddingRight: 16 },  
+  scrollContent: { paddingRight: 16 },
   card: {
     backgroundColor: "#fff",
     padding: 16,

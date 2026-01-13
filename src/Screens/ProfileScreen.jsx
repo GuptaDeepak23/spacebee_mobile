@@ -1,170 +1,168 @@
 import React from 'react'
-import { useEffect, useState } from 'react'
+import { useProfileStats } from '../Api/use.api'
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '../Context/Auth_Context'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import base_url from '../base_url'
-import axios from 'axios'
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
+import Toast from 'react-native-toast-message'
 
 
 
 const ProfileScreen = () => {
   const { Logout, userData } = useAuth()
 
-  const [profilestats, setProfilestats] = useState(null)
-
-  useEffect(() => {
-    getProfile()
-  }, [])
-
-  const getProfile = async () => {
-    let token = await AsyncStorage.getItem('token')
-    try {
-      const response = await axios.get(`${base_url}/employee/statistics`, {
-        headers: { Authorization: `Bearer ${token}` }
-      })
-      setProfilestats(response.data)
-    } catch (error) {
-      console.log(error)
-    }
-  }
+  const { data: profilestats } = useProfileStats()
   const handleLogout = async () => {
-    console.log('Logout button pressed')
+    Toast.show({
+      type: 'success',
+      text1: 'Logout',
+      text2: 'You have been logged out successfully',
+    })
     await Logout()
     // App.js will automatically detect the token removal and switch to AuthStack
   }
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Profile Header - Green Section */}
-      <View style={styles.profileHeader}>
-        <View style={styles.profileTop}>
-          <View style={styles.avatarContainer}>
-            <View style={styles.avatar}>
-              <Text style={styles.avatarText}>{userData?.employee_name?.charAt(0)}</Text>
+    <SafeAreaView edges={['top']}>
+      <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+        {/* Profile Header - Green Section */}
+        <View style={styles.profileHeader}>
+          <View style={styles.profileTop}>
+            <View style={styles.avatarContainer}>
+              <View style={styles.avatar}>
+                <Text style={styles.avatarText}>{userData?.employee_name?.charAt(0)}</Text>
+              </View>
+            </View>
+
+            <View style={styles.profileInfo}>
+              <Text style={styles.name}>{userData?.employee_name}</Text>
+              <Text style={styles.role}>{userData?.employee_role}</Text>
+            </View>
+
+
+          </View>
+
+          {/* Contact Information */}
+          <View style={styles.contactInfo}>
+            <View style={styles.contactRow}>
+              <Ionicons name="mail-outline" size={responsiveFontSize(1.8)} color="#fff" />
+              <Text style={styles.contactText}>{userData?.employee_email}</Text>
+
+            </View>
+
+            <View style={styles.contactRow}>
+              <Ionicons name="briefcase-outline" size={responsiveFontSize(1.8)} color="#fff" />
+              <Text style={styles.contactText}>{userData?.employee_role}</Text>
             </View>
           </View>
+        </View>
 
-          <View style={styles.profileInfo}>
-            <Text style={styles.name}>{userData?.employee_name}</Text>
-            <Text style={styles.role}>{userData?.employee_role}</Text>
+        {/* Booking Statistics Section */}
+        <View style={styles.statsCard}>
+          <Text style={styles.sectionTitle}>Booking Statistics</Text>
+          <View style={styles.statsRow}>
+            <View style={styles.statItem}>
+              <Text style={styles.statValueGreen}>{profilestats?.total_bookings}</Text>
+              <Text style={styles.statLabel}>Total Bookings</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValueGreen}>{profilestats?.hours_booked}</Text>
+              <Text style={styles.statLabel}>Hours Booked</Text>
+            </View>
+            <View style={styles.statDivider} />
+            <View style={styles.statItem}>
+              <Text style={styles.statValueRed}>{profilestats?.cancelled_bookings}</Text>
+              <Text style={styles.statLabel}>Cancelled</Text>
+            </View>
           </View>
+        </View>
 
+
+        <View style={{ height: rh(400) }}>
+          <ScrollView nestedScrollEnabled={true}
+            showsVerticalScrollIndicator={false}>
+
+            {/* My Activity Section */}
+            <Text style={styles.sectionactivity}>My Activity</Text>
+            <View style={styles.sectionCard}>
+
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="checkbox-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>My Bookings</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+              <View style={styles.listDivider} />
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="bar-chart-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>Meetings Insights</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Support & Assistance Section - Highlighted with Blue Border */}
+            <Text style={styles.sectionactivity}>Support & Assistance</Text>
+            <View style={[styles.sectionCard, styles.supportCard]}>
+
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="help-circle-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>Help & FAQ</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+              <View style={styles.listDivider} />
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="headset-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>Contact Support</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+            </View>
+
+            {/* Legal & Account Info Section */}
+            <Text style={styles.sectionactivity}>Legal & Account Info</Text>
+            <View style={styles.sectionCard}>
+
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="document-text-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>Terms & Conditions</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+              <View style={styles.listDivider} />
+              <TouchableOpacity style={styles.listItem}>
+                <View style={styles.listItemLeft}>
+                  <Ionicons name="lock-closed-outline" size={rf(20)} color="#666" />
+                  <Text style={styles.listItemText}>Privacy Policy</Text>
+                </View>
+                <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
+              </TouchableOpacity>
+            </View>
+
+            <TouchableOpacity
+              style={styles.logoutButton}
+              onPress={handleLogout}
+            >
+              <Text style={styles.logoutButtonText}>Log</Text>
+              <Text style={styles.logoutButtonText}>Out</Text>
+            </TouchableOpacity>
+          </ScrollView>
 
         </View>
 
-        {/* Contact Information */}
-        <View style={styles.contactInfo}>
-          <View style={styles.contactRow}>
-            <Ionicons name="mail-outline" size={responsiveFontSize(1.8)} color="#fff" />
-            <Text style={styles.contactText}>{userData?.employee_email}</Text>
-
-          </View>
-
-          <View style={styles.contactRow}>
-            <Ionicons name="briefcase-outline" size={responsiveFontSize(1.8)} color="#fff" />
-            <Text style={styles.contactText}>{userData?.employee_role}</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* Booking Statistics Section */}
-      <View style={styles.statsCard}>
-        <Text style={styles.sectionTitle}>Booking Statistics</Text>
-        <View style={styles.statsRow}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValueGreen}>{profilestats?.total_bookings}</Text>
-            <Text style={styles.statLabel}>Total Bookings</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValueGreen}>{profilestats?.hours_booked}</Text>
-            <Text style={styles.statLabel}>Hours Booked</Text>
-          </View>
-          <View style={styles.statDivider} />
-          <View style={styles.statItem}>
-            <Text style={styles.statValueRed}>{profilestats?.cancelled_bookings}</Text>
-            <Text style={styles.statLabel}>Cancelled</Text>
-          </View>
-        </View>
-      </View>
-
-      {/* My Activity Section */}
-      <Text style={styles.sectionactivity}>My Activity</Text>
-      <View style={styles.sectionCard}>
-
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="checkbox-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>My Bookings</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-        <View style={styles.listDivider} />
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="bar-chart-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>Meetings Insights</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Support & Assistance Section - Highlighted with Blue Border */}
-      <Text style={styles.sectionactivity}>Support & Assistance</Text>
-      <View style={[styles.sectionCard, styles.supportCard]}>
-
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="help-circle-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>Help & FAQ</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-        <View style={styles.listDivider} />
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="headset-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>Contact Support</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      {/* Legal & Account Info Section */}
-      <Text style={styles.sectionactivity}>Legal & Account Info</Text>
-      <View style={styles.sectionCard}>
-
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="document-text-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>Terms & Conditions</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-        <View style={styles.listDivider} />
-        <TouchableOpacity style={styles.listItem}>
-          <View style={styles.listItemLeft}>
-            <Ionicons name="lock-closed-outline" size={rf(20)} color="#666" />
-            <Text style={styles.listItemText}>Privacy Policy</Text>
-          </View>
-          <Ionicons name="chevron-forward" size={rf(20)} color="#999" />
-        </TouchableOpacity>
-      </View>
-
-      <TouchableOpacity
-        style={styles.logoutButton}
-        onPress={handleLogout}
-      >
-        <Text style={styles.logoutButtonText}>Log</Text>
-        <Text style={styles.logoutButtonText}>Out</Text>
-      </TouchableOpacity>
-      {/* Bottom padding for scroll */}
-      <View style={styles.bottomPadding} />
-    </ScrollView>
+        {/* Bottom padding for scroll */}
+        <View style={styles.bottomPadding} />
+      </ScrollView>
+    </SafeAreaView>
   )
 }
 

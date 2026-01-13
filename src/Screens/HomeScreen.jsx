@@ -10,11 +10,9 @@ import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-nat
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'react-native'
 import { useAuth } from '../Context/Auth_Context'
-import axios from 'axios'
-import base_url from '../base_url'
-import AsyncStorage from '@react-native-async-storage/async-storage'
-import { useQuery } from '@tanstack/react-query'
+import { useStats, useNextMeeting } from '../Api/use.api';
 import { useUpcomingMeetings } from '../components/Upcomingmeeting'
+import Toast from 'react-native-toast-message';
 
 export const HomeScreen = () => {
 
@@ -39,79 +37,21 @@ export const HomeScreen = () => {
     hours = hours % 12;
     hours = hours ? hours : 12;
     const minutesStr = minutes < 10 ? '0' + minutes : minutes;
-    return `${hours}:${minutesStr} ${ampm}`;
+    return `${hours}:${minutesStr} ${ampm} `;
   };
 
-  useEffect(() => {
-    console.log('HomeScreen - userData:', userData)
-
-
-
-    //
-
-    // nextmeetinginfo()
-    // getstats()
-  }, [userData])
-  const getstats = async () => {
-    let token = await AsyncStorage.getItem('token')
-    try {
-      const response = await axios.get(`${base_url}/stats`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      return response.data
-      // setStats(response.data) 
-      console.log('Stats API response:', response.data)
-    } catch (error) {
-      console.error('Error fetching stats:', error)
-    }
-  }
-
-
-  const nextmeetinginfo = async () => {
-    let token = await AsyncStorage.getItem('token')
-    try {
-      const response = await axios.get(`${base_url}/next-meeting`, {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      })
-      return response.data
-      // setNextmeetinginfo(response.data)
-    }
-    catch (error) {
-      console.error('Error fetching next meeting info:', error)
-    }
-  }
 
   const {
     data: stats,
     isLoading: statsLoading,
-    isError: statsError,
-    refetch: refetchStats
-  } = useQuery({
-    queryKey: ["stats"],
-    queryFn: getstats,
-    refetchInterval: 60000, // 🔥 auto-refresh every 30 sec
-    placeholderData: prev => prev,
-    keepPreviousData: true,
-  })
+  } = useStats()
 
   const {
     data: nextMeetingData,
-    isLoading: nextMeetingLoading,
-    isError: nextMeetingError,
-    refetch: refetchNextMeeting
-  } = useQuery({
-    queryKey: ["next-meeting"],
-    queryFn: nextmeetinginfo,
-    refetchInterval: 60000, // 🔥 auto-refresh every 30 sec
-    placeholderData: prev => prev,
-    keepPreviousData: true,
-  });
+  } = useNextMeeting()
 
-  const { data: upcomingMeetings, isLoading: upcomingMeetingsLoading, isError: upcomingMeetingsError } = useUpcomingMeetings();
+  const { data: upcomingMeetingsData } = useUpcomingMeetings();
+  const upcomingMeetings = upcomingMeetingsData?.bookings || [];
 
 
   const handleBookRoom = (roomName) => {
@@ -267,7 +207,15 @@ export const HomeScreen = () => {
                 )
               })}
             </ScrollView>
-            <RoomCard onRefreshUpcoming={onRefreshUpcoming} />
+            <View style={{ height: rh(400) }}>
+              <ScrollView
+                nestedScrollEnabled={true}
+                showsVerticalScrollIndicator={false}
+
+              >
+                <RoomCard onRefreshUpcoming={onRefreshUpcoming} />
+              </ScrollView>
+            </View>
           </View>
         </ScrollView>
 
@@ -313,7 +261,7 @@ const styles = StyleSheet.create({
   summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: responsiveHeight(-1) },
   summaryCard: { backgroundColor: '#E8FDF2', padding: responsiveWidth(3.8), borderRadius: rw(12), width: responsiveWidth(45) },
   number: { fontWeight: 'bold', fontSize: rf(18), marginTop: rh(6) },
-  sectionTitle: { fontWeight: '900', fontSize: rf(16), fontFamily: 'Arial, Helvetica, sans-serif' },
+  sectionTitle: { fontWeight: '900', fontSize: rf(16), fontFamily: 'Arial, Helvetica, sans-serif', marginBottom: '10' },
   upcomingMeetingsContainer: { flexDirection: 'column', justifyContent: 'flex-start', alignItems: 'flex-start', marginBottom: rh(12), marginTop: rh(20), gap: rh(1) },
   viewAll: { color: '#00C896', fontWeight: '600', fontSize: rf(12) },
   horizontalScroll: {

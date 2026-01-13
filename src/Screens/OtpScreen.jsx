@@ -1,4 +1,4 @@
-import { StyleSheet, Text, View, TextInput, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, View, TextInput, TouchableOpacity, Animated } from 'react-native'
 import React, { useRef, useState, useEffect } from 'react'
 import { SafeAreaView } from 'react-native-safe-area-context'
 import { responsiveHeight, responsiveWidth, responsiveFontSize } from 'react-native-responsive-dimensions'
@@ -17,6 +17,9 @@ const OtpScreen = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', ''])
   const [currentIndex, setCurrentIndex] = useState(0)
   const [loading, setLoading] = useState(false)
+  const shakeAnimation = useRef(new Animated.Value(0)).current
+  const [isError, setIsError] = useState(false)
+
 
   const inputRefs = Array.from({ length: 6 }, () => useRef(null))
 
@@ -41,26 +44,19 @@ const OtpScreen = () => {
       const res = await VerifyOtp(email, code)
       console.log('Verify OTP Response:', res)
 
-      if (res?.detail) {
-        resetOtp()
-        return
-      }
-
+      // If OTP is correct
       if (res?.access_token) {
-        // Show success toast
         const message = res?.detail || 'Login successful!'
         Toast.show({
           type: 'success',
           text1: 'Success',
           text2: message,
           position: 'top',
-          visibilityTime: 2500,
-          topOffset: 50,
+          topOffset: 60,
         })
 
         await AsyncStorage.setItem('token', res.access_token)
 
-        // Delay navigation to show toast
         setTimeout(() => {
           navigation.reset({
             index: 0,
@@ -68,12 +64,39 @@ const OtpScreen = () => {
           })
         }, 2000)
       }
-    } catch (err) {
-      resetOtp()
-    } finally {
+    }  catch (err) {
+  console.log('OTP Verification Error:', err);
+
+  let errorMsg = 'Invalid OTP. Please try again.';
+
+  const data = err?.response?.data || err?.data || err;
+
+  if (typeof data?.detail === 'string') {
+    errorMsg = data.detail;
+  }
+  else if (Array.isArray(data?.detail)) {
+    // FastAPI / validation error format
+    errorMsg = data.detail[0]?.msg || errorMsg;
+  }
+  else if (typeof err?.message === 'string') {
+    errorMsg = err.message;
+  }
+
+  Toast.show({
+    type: 'error',
+    text1: 'Error',
+    text2: errorMsg, // ✅ always string now
+    position: 'top',
+    topOffset: 60,
+  });
+
+  triggerShake();
+  resetOtp();
+} finally {
       setLoading(false)
     }
   }
+
 
   const resetOtp = () => {
     setOtp(['', '', '', '', '', ''])
@@ -144,6 +167,19 @@ const OtpScreen = () => {
     }
   }
 
+
+  const triggerShake = () => {
+    setIsError(true)
+    Animated.sequence([
+      Animated.timing(shakeAnimation, { toValue: 15, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: -15, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 10, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: -10, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 5, duration: 40, useNativeDriver: true }),
+      Animated.timing(shakeAnimation, { toValue: 0, duration: 40, useNativeDriver: true }),
+    ]).start(() => setIsError(false))
+  }
+
   return (
     <SafeAreaView>
       <View style={styles.container}>
@@ -151,7 +187,12 @@ const OtpScreen = () => {
           <Text style={styles.otpTitle}>OTP Verification</Text>
           <Text style={styles.otpText}>Enter the OTP sent to your email</Text>
 
-          <View style={styles.otpInputContainer}>
+          <Animated.View
+            style={[
+              styles.otpInputContainer,
+              { transform: [{ translateX: shakeAnimation }] },
+            ]}
+          >
             {otp.map((digit, index) => (
               <TextInput
                 key={index}
@@ -161,14 +202,16 @@ const OtpScreen = () => {
                 maxLength={1}
                 style={[
                   styles.otpInput,
-                  index === currentIndex ? styles.activeBox : styles.inactiveBox
+                  index === currentIndex ? styles.activeBox : styles.inactiveBox,
+                  isError && { borderColor: 'red' }, // red border on error
                 ]}
                 onChangeText={(val) => handleChange(val, index)}
                 onKeyPress={(e) => handleKeyPress(e, index)}
                 onFocus={() => handleFocus(index)}
               />
             ))}
-          </View>
+          </Animated.View>
+
 
           <TouchableOpacity onPress={resendOtp} disabled={loading}>
             <Text style={styles.otpResendText}>
@@ -178,7 +221,6 @@ const OtpScreen = () => {
           </TouchableOpacity>
         </View>
       </View>
-      <Toast />
     </SafeAreaView>
   )
 }
