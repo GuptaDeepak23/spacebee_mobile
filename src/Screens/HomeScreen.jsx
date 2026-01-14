@@ -93,7 +93,12 @@ export const HomeScreen = () => {
                   <TextInput
                     placeholder="Search meeting room"
                     placeholderTextColor="#888"
-                    style={{ fontSize: responsiveFontSize(1.5), paddingVertical: responsiveHeight(0) }}
+                    style={{
+                      fontSize: responsiveFontSize(1.5),
+                      paddingVertical: responsiveHeight(0),
+                      flex: 1,
+                      height: '100%'
+                    }}
                   />
                 </View>
                 <View style={styles.filterIconContainer}>
@@ -270,8 +275,8 @@ const styles = StyleSheet.create({
   },
   searchIconContainer: {
     flexDirection: 'row',
-
-
+    alignItems: 'center',
+    flex: 1,
   },
   filterIconContainer: {
     flexDirection: 'row',

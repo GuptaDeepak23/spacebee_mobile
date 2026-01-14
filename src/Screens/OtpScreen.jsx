@@ -67,25 +67,12 @@ const OtpScreen = () => {
     }  catch (err) {
   console.log('OTP Verification Error:', err);
 
-  let errorMsg = 'Invalid OTP. Please try again.';
-
-  const data = err?.response?.data || err?.data || err;
-
-  if (typeof data?.detail === 'string') {
-    errorMsg = data.detail;
-  }
-  else if (Array.isArray(data?.detail)) {
-    // FastAPI / validation error format
-    errorMsg = data.detail[0]?.msg || errorMsg;
-  }
-  else if (typeof err?.message === 'string') {
-    errorMsg = err.message;
-  }
+  let errorMsg = err?.response?.data?.detail
 
   Toast.show({
     type: 'error',
     text1: 'Error',
-    text2: errorMsg, // ✅ always string now
+    text2: errorMsg, 
     position: 'top',
     topOffset: 60,
   });

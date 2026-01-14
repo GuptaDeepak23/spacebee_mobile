@@ -59,7 +59,7 @@ const LoginScreen = () => {
         topOffset: 60,
       })
 
-      navigation.navigate('OtpScreen')
+      navigation.navigate('OtpScreen', { email })
 
 
 
