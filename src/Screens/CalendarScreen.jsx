@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native'
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions'
@@ -12,7 +12,15 @@ const CalendarScreen = () => {
   const [selectedDay, setSelectedDay] = useState(new Date()); // show events for this day
   const yyyy = currentDate.getFullYear();
   const mm = String(currentDate.getMonth() + 1).padStart(2, '0'); // always 2-digit month
-  const { data: calendarEvents = [], isLoading: loading } = useCalendarEvents(`${yyyy}-${mm}`);
+  const { data: calendarEvents = [], isLoading: loading, refetch } = useCalendarEvents(`${yyyy}-${mm}`);
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await refetch();
+    setRefreshing(false);
+  };
 
   // Map meeting_date to the calendar for event bubbles
   const eventsMap = {};
@@ -110,7 +118,11 @@ const CalendarScreen = () => {
   const currentYear = currentDate.getFullYear()
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
+    <ScrollView
+      style={styles.container}
+      showsVerticalScrollIndicator={false}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
+    >
       {/* Header */}
       <View style={styles.header}>
         <Text style={styles.headerTitle}>Calendar</Text>

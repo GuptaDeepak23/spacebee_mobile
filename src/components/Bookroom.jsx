@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { View, Text, StyleSheet, TextInput, TouchableOpacity, Modal, ScrollView, Platform } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { Calendar } from 'react-native-calendars'
+import CalendarPicker from 'react-native-calendar-picker'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { rw, rh, rf, rp } from '../utils/responsive'
 import AsyncStorage from '@react-native-async-storage/async-storage'
@@ -48,21 +48,9 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
     return `${month}/${day}/${year}`
   }
 
-  // Format date to YYYY-MM-DD for calendar
-  const formatDateForCalendar = (date) => {
-    if (!date) return ''
-    const d = new Date(date)
-    const year = d.getFullYear()
-    const month = String(d.getMonth() + 1).padStart(2, '0')
-    const day = String(d.getDate()).padStart(2, '0')
-    return `${year}-${month}-${day}`
-  }
 
-  // Parse date from YYYY-MM-DD string
-  const parseDateFromCalendar = (dateString) => {
-    if (!dateString) return new Date()
-    return new Date(dateString)
-  }
+
+
 
   // Format time to string
   const formatTime = (date) => {
@@ -88,10 +76,6 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
     }
   }
 
-  const onDayPress = (day) => {
-    const selectedDate = parseDateFromCalendar(day.dateString)
-    setTempDate(selectedDate)
-  }
 
   const openTimePicker = (type) => {
     setPickerType(type)
@@ -399,38 +383,36 @@ const Bookroom = ({ roomId, initialMeeting, onClose, onBookingSuccess, isResched
               </TouchableOpacity>
             </View>
             <View style={styles.calendarContainer}>
-              <Calendar
-                onDayPress={onDayPress}
-                markedDates={{
-                  [formatDateForCalendar(tempDate)]: {
-                    selected: true,
-                    selectedColor: '#00C896',
-                    selectedTextColor: '#fff'
-                  }
-                }}
-                minDate={formatDateForCalendar(new Date())}
-                theme={{
-                  backgroundColor: '#ffffff',
-                  calendarBackground: '#ffffff',
-                  textSectionTitleColor: '#666',
-                  selectedDayBackgroundColor: '#00C896',
-                  selectedDayTextColor: '#ffffff',
-                  todayTextColor: '#00C896',
-                  dayTextColor: '#1A1A1A',
-                  textDisabledColor: '#d9e1e8',
-                  dotColor: '#00C896',
-                  selectedDotColor: '#ffffff',
-                  arrowColor: '#00C896',
-                  monthTextColor: '#1A1A1A',
-                  textDayFontWeight: '400',
-                  textMonthFontWeight: 'bold',
-                  textDayHeaderFontWeight: '600',
-                  textDayFontSize: rf(14),
-                  textMonthFontSize: rf(16),
-                  textDayHeaderFontSize: rf(12)
-                }}
-                style={styles.calendar}
-              />
+              <CalendarPicker
+  onDateChange={(date) => {
+    if (date) {
+      setTempDate(new Date(date))
+    }
+  }}
+  selectedStartDate={tempDate}
+  minDate={new Date()}
+  selectedDayColor="#00C896"
+  selectedDayTextColor="#ffffff"
+  todayBackgroundColor="#EAFBF5"
+  todayTextStyle={{ color: '#00C896' }}
+  textStyle={{
+    color: '#1A1A1A',
+    fontSize: rf(14),
+  }}
+  headerWrapperStyle={{
+    paddingVertical: rh(10),
+  }}
+  monthTitleStyle={{
+    fontSize: rf(16),
+    fontWeight: 'bold',
+    color: '#1A1A1A',
+  }}
+  yearTitleStyle={{
+    fontSize: rf(14),
+    color: '#666',
+  }}
+/>
+
             </View>
             <View style={styles.pickerFooter}>
               <TouchableOpacity

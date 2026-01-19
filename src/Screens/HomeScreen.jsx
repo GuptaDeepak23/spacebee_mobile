@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react'
-import { View, Text, ScrollView, Image, StyleSheet, TextInput, Modal } from 'react-native'
+import { View, Text, ScrollView, Image, StyleSheet, TextInput, Modal, RefreshControl } from 'react-native'
 import { UpcomingMeetingCard } from '../components/Upcomingmeeting'
 import { RoomCard } from '../components/Roomcard'
 import { TouchableOpacity } from 'react-native'
@@ -10,7 +10,7 @@ import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-nat
 import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context'
 import { StatusBar } from 'react-native'
 import { useAuth } from '../Context/Auth_Context'
-import { useStats, useNextMeeting } from '../Api/use.api';
+import { useStats, useNextMeeting, useRoomsStatus } from '../Api/use.api';
 import { useUpcomingMeetings } from '../components/Upcomingmeeting'
 import Toast from 'react-native-toast-message';
 
@@ -44,14 +44,38 @@ export const HomeScreen = () => {
   const {
     data: stats,
     isLoading: statsLoading,
+    refetch: refetchStats
   } = useStats()
 
   const {
     data: nextMeetingData,
+    refetch: refetchNextMeeting
   } = useNextMeeting()
 
-  const { data: upcomingMeetingsData } = useUpcomingMeetings();
+  const { data: upcomingMeetingsData, refetch: refetchUpcomingMeetings } = useUpcomingMeetings();
+
+  const {
+    data: rooms = [],
+    isLoading: roomsLoading,
+    isError: roomsError,
+    refetch: refetchRooms,
+  } = useRoomsStatus();
+
   const upcomingMeetings = upcomingMeetingsData?.bookings || [];
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    onRefreshUpcoming();
+    await Promise.all([
+      refetchStats(),
+      refetchNextMeeting(),
+      refetchUpcomingMeetings(),
+      refetchRooms()
+    ]);
+    setRefreshing(false);
+  };
 
 
   const handleBookRoom = (roomName) => {
@@ -67,7 +91,7 @@ export const HomeScreen = () => {
     <>
       <SafeAreaView edges={['top']}>
 
-        <ScrollView>
+        <ScrollView refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}>
           <View style={styles.container}>
             <View style={styles.header}>
               <View style={styles.headerLeft}>
@@ -218,7 +242,7 @@ export const HomeScreen = () => {
                 showsVerticalScrollIndicator={false}
 
               >
-                <RoomCard onRefreshUpcoming={onRefreshUpcoming} />
+                <RoomCard onRefreshUpcoming={onRefreshUpcoming} rooms={rooms} roomsLoading={roomsLoading} roomsError={roomsError} />
               </ScrollView>
             </View>
           </View>

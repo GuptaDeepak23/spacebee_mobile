@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, RefreshControl } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { rw, rh, rf } from '../utils/responsive';
 import {
@@ -13,9 +13,17 @@ const MyBookingScreen = () => {
   const tabs = ['All', 'Upcoming', 'Past', 'Cancelled'];
   const [activeTab, setActiveTab] = useState('All');
 
-  const { data: upcomingData } = useMyBookings('upcoming');
-  const { data: pastData } = useMyBookings('previous');
-  const { data: cancelledData } = useMyBookings('cancelled');
+  const { data: upcomingData, refetch: refetchUpcoming } = useMyBookings('upcoming');
+  const { data: pastData, refetch: refetchPast } = useMyBookings('previous');
+  const { data: cancelledData, refetch: refetchCancelled } = useMyBookings('cancelled');
+
+  const [refreshing, setRefreshing] = useState(false);
+
+  const onRefresh = async () => {
+    setRefreshing(true);
+    await Promise.all([refetchUpcoming(), refetchPast(), refetchCancelled()]);
+    setRefreshing(false);
+  };
 
   const upcomingbookings = upcomingData?.bookings || [];
   const pastbookings = pastData?.bookings || [];
@@ -75,6 +83,7 @@ const MyBookingScreen = () => {
         style={styles.scrollView}
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} />}
       >
         {filteredBookings.length > 0 ? (
           filteredBookings.map((booking) => (

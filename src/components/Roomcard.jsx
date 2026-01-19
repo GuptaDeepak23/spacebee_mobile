@@ -2,20 +2,14 @@ import React, { useState } from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, ActivityIndicator, Modal } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { responsiveFontSize, responsiveWidth, responsiveHeight } from 'react-native-responsive-dimensions';
-import { useRoomsStatus } from '../Api/use.api';
+
 import Bookroom from './Bookroom';
 
-export const RoomCard = ({ onRefreshUpcoming }) => {
+export const RoomCard = ({ onRefreshUpcoming, rooms = [], roomsLoading, roomsError }) => {
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState(null);
-  const [selectedRoomId, setSelectedRoomId] = useState(null);
+  const [selectedRoomId, setSelectedRoomId] = useState(null); // Keep formatting
 
-  const {
-    data: rooms = [],
-    isLoading: roomsLoading,
-    isError: roomsError,
-    refetch: refetchRooms,
-  } = useRoomsStatus();
 
   const handleBookRoom = (room) => {
     setSelectedRoom(room?.name);
